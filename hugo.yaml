@@ -1,0 +1,37 @@
+baseURL: 'https://www.streamthoughts.io'
+languageCode: 'en-us'
+title: 'Florian Hussonnois - Random Thoughts about Software Engineering'
+theme: 'mini'
+defaultContentLanguage: "en"
+enableRobotsTXT: true
+
+social:
+  github: "https://github.com/fhussonnois"
+  twitter: "https://twitter.com/fhussonnois"
+  stackoverflow: "https://stackoverflow.com/users/3660859/fhussonnois"
+  linkedin: https://www.linkedin.com/in/florian-hussonnois/
+
+# Site parameters
+params:
+  # Site Author
+  author: Florian Hussonnois
+  # Author biography
+  bio: Random Thoughts about Software Engineering 
+  # Site Description, used in HTML meat
+  description: My Blog
+  enableComments: false
+  enableGoogleAnalytics: false
+  showPowerBy: false
+  enableRSS: true
+  customCSS:
+    - /css/custom.css
+  # Tabs
+  conferences: Conferences
+  projects: Projects
+  archive: Blog
+  subscribe: RSS
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
