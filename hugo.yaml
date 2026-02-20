@@ -18,7 +18,7 @@ params:
   # Author biography
   bio: Random Thoughts about Software Engineering 
   # Site Description, used in HTML meat
-  description: My Blog
+  description: "Florian Hussonnois - Blog about Apache Kafka, Data Streaming, Event-Driven Architecture, and Open Source Software Engineering"
   enableComments: false
   enableGoogleAnalytics: false
   showPowerBy: false
