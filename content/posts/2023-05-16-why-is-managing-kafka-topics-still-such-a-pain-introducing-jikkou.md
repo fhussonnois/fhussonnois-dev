@@ -10,6 +10,7 @@ tags = [
     "open source",
 ]
 draft = false
+cover = "/images/posts/jikkou-cover.jpg"
 +++
 
 ![Photo by Jon Cartagena on Unsplash](/images/posts/jikkou-cover.jpg)

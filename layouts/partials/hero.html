@@ -1,0 +1,23 @@
+<section class="hero">
+  <div class="container">
+    <div class="hero-avatar-wrap">
+      <img class="hero-avatar" src="{{ "images/avatar.png" | relURL }}" alt="{{ .Site.Params.author }}">
+    </div>
+    <h1 class="hero-name">{{ .Site.Params.author }}</h1>
+    <p class="hero-bio"><span class="prompt">&gt;_</span> {{ .Site.Params.bio }}</p>
+    <div class="hero-socials">
+      {{ with .Site.Social.github }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="GitHub">{{ partial "svgs/github.svg" }}</a>
+      {{ end }}
+      {{ with .Site.Social.twitter }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="Twitter">{{ partial "svgs/twitter.svg" }}</a>
+      {{ end }}
+      {{ with .Site.Social.linkedin }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="LinkedIn">{{ partial "svgs/linkedin.svg" }}</a>
+      {{ end }}
+      {{ with .Site.Social.stackoverflow }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="Stack Overflow">{{ partial "svgs/stackoverflow.svg" }}</a>
+      {{ end }}
+    </div>
+  </div>
+</section>

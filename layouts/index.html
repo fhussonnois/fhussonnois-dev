@@ -1,0 +1,17 @@
+{{ define "main" }}
+
+{{ partial "hero.html" . }}
+
+<div class="container">
+  <h2 class="section-heading"><span class="hash">#</span> Latest Posts</h2>
+  <div class="post-grid">
+    {{ range first 6 (where .Site.RegularPages "Section" "posts") }}
+    {{ partial "post-card.html" . }}
+    {{ end }}
+  </div>
+  <div class="view-all">
+    <a href="{{ "posts/" | relURL }}">View all posts &rarr;</a>
+  </div>
+</div>
+
+{{ end }}

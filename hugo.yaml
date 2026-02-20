@@ -1,7 +1,6 @@
 baseURL: 'https://www.fhussonnois.dev'
 languageCode: 'en-us'
 title: 'Florian Hussonnois - Random Thoughts about Software Engineering'
-theme: 'mini'
 defaultContentLanguage: "en"
 enableRobotsTXT: true
 
@@ -16,22 +15,16 @@ params:
   # Site Author
   author: Florian Hussonnois
   # Author biography
-  bio: Random Thoughts about Software Engineering 
-  # Site Description, used in HTML meat
+  bio: Random Thoughts about Software Engineering
+  # Site Description, used in HTML meta
   description: "Florian Hussonnois - Blog about Apache Kafka, Data Streaming, Event-Driven Architecture, and Open Source Software Engineering"
-  enableComments: false
-  enableGoogleAnalytics: false
-  showPowerBy: false
-  enableRSS: true
-  customCSS:
-    - /css/custom.css
-  # Tabs
-  conferences: Conferences
-  projects: Projects
-  archive: Blog
-  subscribe: RSS
 
 markup:
   goldmark:
     renderer:
       unsafe: true
+  highlight:
+    style: catppuccin-mocha
+    noClasses: true
+    guessSyntax: true
+    lineNos: false

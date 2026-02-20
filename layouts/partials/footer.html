@@ -1,0 +1,21 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-socials">
+      {{ with .Site.Social.github }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="GitHub">{{ partial "svgs/github.svg" }}</a>
+      {{ end }}
+      {{ with .Site.Social.twitter }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="Twitter">{{ partial "svgs/twitter.svg" }}</a>
+      {{ end }}
+      {{ with .Site.Social.linkedin }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="LinkedIn">{{ partial "svgs/linkedin.svg" }}</a>
+      {{ end }}
+      {{ with .Site.Social.stackoverflow }}
+      <a href="{{ . }}" target="_blank" rel="noopener" aria-label="Stack Overflow">{{ partial "svgs/stackoverflow.svg" }}</a>
+      {{ end }}
+    </div>
+    <p class="footer-prompt">
+      <span class="prompt">&gt;_</span> &copy; {{ now.Year }} {{ .Site.Params.author }}
+    </p>
+  </div>
+</footer>

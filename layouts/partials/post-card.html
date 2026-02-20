@@ -1,0 +1,25 @@
+<article class="post-card">
+  <a href="{{ .Permalink }}">
+    {{ $cover := .Params.cover }}
+    {{ if $cover }}
+    <img class="post-card-cover" src="{{ $cover }}" alt="{{ .Title }}" loading="lazy">
+    {{ else }}
+    <img class="post-card-cover" src="{{ "images/default-cover.svg" | relURL }}" alt="{{ .Title }}" loading="lazy">
+    {{ end }}
+    <div class="post-card-body">
+      <h3 class="post-card-title">{{ .Title }}</h3>
+      <p class="post-card-meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+        &middot; {{ .ReadingTime }} min read
+      </p>
+      {{ with .Params.tags }}
+      <div class="post-card-tags">
+        {{ range first 3 . }}
+        <span class="tag-pill">{{ . }}</span>
+        {{ end }}
+      </div>
+      {{ end }}
+      <p class="post-card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
+    </div>
+  </a>
+</article>

@@ -18,24 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+          fetch-depth: 0
 
-      - name: Pull & update submodules recursively
-        run: |
-          git submodule sync
-          git submodule update --init --recursive
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: '0.120.3'
           extended: true
-
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "14.x"
-      - run: npm install
 
       - name: Build
         run: hugo --minify -v -s . -d ./public

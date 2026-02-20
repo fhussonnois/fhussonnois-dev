@@ -1,0 +1,24 @@
+<nav class="site-nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a class="nav-logo" href="{{ "/" | relURL }}"><span class="prompt">&gt;_</span> fhussonnois.dev</a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="{{ "/posts/" | relURL }}" {{ if eq .Section "posts" }}aria-current="section"{{ end }}>Blog</a></li>
+      <li><a href="{{ "/projects/" | relURL }}" {{ if eq .Section "projects" }}aria-current="section"{{ end }}>Projects</a></li>
+      <li><a href="{{ "/conferences/" | relURL }}" {{ if eq .Section "conferences" }}aria-current="section"{{ end }}>Conferences</a></li>
+      <li><a href="{{ "/about/" | relURL }}" {{ if eq .Section "about" }}aria-current="section"{{ end }}>About</a></li>
+      <li><a href="{{ "/tags/" | relURL }}" {{ if eq .Kind "taxonomy" }}aria-current="section"{{ end }}>Tags</a></li>
+      {{ with .OutputFormats.Get "rss" }}
+      <li><a href="{{ .RelPermalink }}" title="RSS Feed">RSS</a></li>
+      {{ end }}
+    </ul>
+    <div class="nav-right">
+      <button class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="icon-sun">{{ partial "svgs/sun.svg" }}</span>
+        <span class="icon-moon">{{ partial "svgs/moon.svg" }}</span>
+      </button>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>

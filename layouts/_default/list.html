@@ -1,0 +1,27 @@
+{{ define "main" }}
+<div class="container section-page">
+  <h1 class="section-heading"><span class="hash">#</span> {{ .Title }}</h1>
+
+  {{ $pages := .Pages.ByDate.Reverse }}
+  {{ $grouped := $pages.GroupByDate "2006" }}
+
+  {{ range $grouped }}
+  <h2 class="archive-year">{{ .Key }}</h2>
+  <ul class="archive-list">
+    {{ range .Pages }}
+    <li class="archive-item">
+      <span class="archive-date">{{ .Date.Format "Jan 02" }}</span>
+      <a class="archive-title" href="{{ .Permalink }}">{{ .Title }}</a>
+      {{ with .Params.tags }}
+      <span class="archive-tags">
+        {{ range first 2 . }}
+        <span class="tag-pill">{{ . }}</span>
+        {{ end }}
+      </span>
+      {{ end }}
+    </li>
+    {{ end }}
+  </ul>
+  {{ end }}
+</div>
+{{ end }}

@@ -1,0 +1,13 @@
+{{ define "main" }}
+<div class="container section-page">
+  <h1 class="section-heading"><span class="hash">#</span> {{ .Title }}</h1>
+  <ul class="archive-list">
+    {{ range .Pages.ByDate.Reverse }}
+    <li class="archive-item">
+      <span class="archive-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+      <a class="archive-title" href="{{ .Permalink }}">{{ .Title }}</a>
+    </li>
+    {{ end }}
+  </ul>
+</div>
+{{ end }}
