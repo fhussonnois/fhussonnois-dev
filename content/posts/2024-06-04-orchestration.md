@@ -8,12 +8,13 @@ tags = [
     "orchestration",
 ]
 draft = false
-cover = "https://cdn-images-1.medium.com/max/2048/1*jeEoCSC6yg9Nk-fUseb55Q.jpeg"
+description = "Explore why orchestration platforms are essential in today's disaggregated software architectures, and how they tame integration complexity."
+cover = "/images/posts/orchestration-cover.jpg"
 +++
 
 _This blog post was originally published on [Medium](https://medium.com/@fhussonnois/navigating-complexity-the-rise-of-orchestration-platforms-in-a-disaggregated-software-architecture-465b6f791f9c)_
 
-![](https://cdn-images-1.medium.com/max/2048/1*jeEoCSC6yg9Nk-fUseb55Q.jpeg)
+![Orchestration platforms in disaggregated architectures](/images/posts/orchestration-cover.jpg)
 
 ## **The challenge to solve: The disaggregation of software architectures**
 

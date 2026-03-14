@@ -1,6 +1,11 @@
 baseURL: 'https://www.fhussonnois.dev'
 languageCode: 'en-us'
-title: 'Florian Hussonnois - Random Thoughts about Software Engineering'
+title: 'Florian Hussonnois — Apache Kafka, Kestra & Data Streaming'
+
+sitemap:
+  changefreq: weekly
+  priority: 0.5
+  filename: sitemap.xml
 defaultContentLanguage: "en"
 enableRobotsTXT: true
 
@@ -17,7 +22,8 @@ params:
   # Author biography
   bio: Random Thoughts about Software Engineering
   # Site Description, used in HTML meta
-  description: "Florian Hussonnois - Blog about Apache Kafka, Data Streaming, Event-Driven Architecture, and Open Source Software Engineering"
+  description: "Florian Hussonnois — Lead Software Engineer at Kestra. Writing about Apache Kafka, data streaming, orchestration, and distributed system architectures."
+  twitter: "@fhussonnois"
 
 markup:
   goldmark:
