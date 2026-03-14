@@ -1,0 +1,32 @@
+{{ define "main" }}
+<div class="container section-page">
+  <h1 class="section-heading"><span class="hash">#</span> Open Source Contributions</h1>
+  <div class="prose">
+    {{ .Content }}
+
+    {{ $total := 0 }}
+    {{ range .Site.Data.contributions.contributions }}
+      {{ $total = add $total (len .prs) }}
+    {{ end }}
+    <p class="contribution-summary">{{ $total }} merged pull requests across {{ len .Site.Data.contributions.contributions }} projects.</p>
+
+    {{ range .Site.Data.contributions.contributions }}
+    <h2 class="contribution-repo">
+      <a href="{{ .repo_url }}" target="_blank" rel="noopener">{{ .repo }}</a>
+      <span class="contribution-count">({{ len .prs }})</span>
+    </h2>
+    <ul class="archive-list">
+      {{ range .prs }}
+      <li class="archive-item">
+        <span class="archive-date">{{ .merged_at | time.Format "Jan 2006" }}</span>
+        <span class="archive-title">
+          <a href="{{ .url }}" target="_blank" rel="noopener">#{{ .number }}</a> — {{ .title }}
+          {{ with .kip }}<a class="kip-badge" href="{{ .url }}" target="_blank" rel="noopener">KIP-{{ .number }}</a>{{ end }}
+        </span>
+      </li>
+      {{ end }}
+    </ul>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

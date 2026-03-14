@@ -4,6 +4,7 @@
     <ul class="nav-links" id="nav-links">
       <li><a href="{{ "/posts/" | relURL }}" {{ if eq .Section "posts" }}aria-current="section"{{ end }}>Blog</a></li>
       <li><a href="{{ "/projects/" | relURL }}" {{ if eq .Section "projects" }}aria-current="section"{{ end }}>Projects</a></li>
+      <li><a href="{{ "/contributions/" | relURL }}" {{ if eq .Section "contributions" }}aria-current="section"{{ end }}>Contributions</a></li>
       <li><a href="{{ "/conferences/" | relURL }}" {{ if eq .Section "conferences" }}aria-current="section"{{ end }}>Conferences</a></li>
       <li><a href="{{ "/about/" | relURL }}" {{ if eq .Section "about" }}aria-current="section"{{ end }}>About</a></li>
       <li><a href="{{ "/tags/" | relURL }}" {{ if eq .Kind "taxonomy" }}aria-current="section"{{ end }}>Tags</a></li>
