@@ -10,6 +10,7 @@ tags = [
     "open-source",
 ]
 draft = false
+description = "Step-by-step guide to producing data into Apache Kafka using Kestra's workflow orchestration platform, with practical examples and open-source code."
 cover = "/images/posts/jeremy-bishop-zYkU9Q44Bzw-unsplash.jpg"
 +++
 

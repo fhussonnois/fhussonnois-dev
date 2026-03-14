@@ -1,6 +1,6 @@
 +++
-title = "About"
-description = "Florian Hussonnois - Bio"
+title = "About — Florian Hussonnois, Apache Kafka Expert & Software Engineer"
+description = "Florian Hussonnois is a Lead Software Engineer at Kestra with 12+ years of experience in stream processing, Apache Kafka, and distributed architectures."
 date = "2025-01-01"
 aliases = ["about-us", "contact"]
 author = "Florian Hussonnois"
