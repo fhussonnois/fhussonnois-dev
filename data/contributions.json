@@ -1,0 +1,163 @@
+{
+  "generated_at": "2026-03-14T22:04:21.371Z",
+  "contributions": [
+    {
+      "repo": "apache/kafka",
+      "repo_url": "https://github.com/apache/kafka",
+      "prs": [
+        {
+          "number": 19188,
+          "title": "KAFKA-18962: Fix onBatchRestored call in GlobalStateManagerImpl",
+          "url": "https://github.com/apache/kafka/pull/19188",
+          "created_at": "2025-03-11T21:30:30Z",
+          "merged_at": "2025-04-09T20:17:38Z"
+        },
+        {
+          "number": 2604,
+          "title": "KAFKA-4794: Add access to OffsetStorageReader from SourceConnector",
+          "url": "https://github.com/apache/kafka/pull/2604",
+          "created_at": "2017-02-27T22:40:28Z",
+          "merged_at": "2020-05-25T01:09:55Z",
+          "kip": {
+            "number": 131,
+            "url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-131"
+          }
+        },
+        {
+          "number": 6413,
+          "title": "KAFKA-6958: Overload methods for group and windowed stream to allow to name operation name using the new Named class",
+          "url": "https://github.com/apache/kafka/pull/6413",
+          "created_at": "2019-03-08T19:24:05Z",
+          "merged_at": "2019-09-23T17:11:57Z",
+          "kip": {
+            "number": 307,
+            "url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-307"
+          }
+        },
+        {
+          "number": 6412,
+          "title": "KAFKA-6958: Overload KTable methods to allow to name operation name using the new Named class",
+          "url": "https://github.com/apache/kafka/pull/6412",
+          "created_at": "2019-03-08T19:20:02Z",
+          "merged_at": "2019-06-17T22:02:52Z",
+          "kip": {
+            "number": 307,
+            "url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-307"
+          }
+        },
+        {
+          "number": 6411,
+          "title": "KAFKA-6958: Overload KStream methods to allow to name operation name  using the new Named class",
+          "url": "https://github.com/apache/kafka/pull/6411",
+          "created_at": "2019-03-08T19:16:48Z",
+          "merged_at": "2019-05-31T13:29:43Z",
+          "kip": {
+            "number": 307,
+            "url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-307"
+          }
+        },
+        {
+          "number": 6410,
+          "title": "KAFKA-6958: Allow to name operation using parameter classes",
+          "url": "https://github.com/apache/kafka/pull/6410",
+          "created_at": "2019-03-08T19:14:44Z",
+          "merged_at": "2019-04-18T22:45:34Z",
+          "kip": {
+            "number": 307,
+            "url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-307"
+          }
+        },
+        {
+          "number": 6409,
+          "title": "KAFKA-6958: Add new NamedOperation interface to enforce consistency i…",
+          "url": "https://github.com/apache/kafka/pull/6409",
+          "created_at": "2019-03-08T19:12:56Z",
+          "merged_at": "2019-03-20T02:27:03Z",
+          "kip": {
+            "number": 307,
+            "url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-307"
+          }
+        },
+        {
+          "number": 5085,
+          "title": "KAFKA-6957 make InternalTopologyBuilder accessible from AbstractStrea…",
+          "url": "https://github.com/apache/kafka/pull/5085",
+          "created_at": "2018-05-26T19:33:46Z",
+          "merged_at": "2018-05-30T18:13:25Z"
+        }
+      ]
+    },
+    {
+      "repo": "apache/storm",
+      "repo_url": "https://github.com/apache/storm",
+      "prs": [
+        {
+          "number": 929,
+          "title": "STORM-1348 - refactor API to remove Insert/Update builder in Cassandra connector",
+          "url": "https://github.com/apache/storm/pull/929",
+          "created_at": "2015-12-07T22:16:37Z",
+          "merged_at": "2016-01-11T20:31:22Z"
+        },
+        {
+          "number": 827,
+          "title": "STORM-1075 add external module storm-cassandra",
+          "url": "https://github.com/apache/storm/pull/827",
+          "created_at": "2015-10-28T11:21:19Z",
+          "merged_at": "2015-12-01T23:49:49Z"
+        }
+      ]
+    },
+    {
+      "repo": "cloudevents/sdk-java",
+      "repo_url": "https://github.com/cloudevents/sdk-java",
+      "prs": [
+        {
+          "number": 90,
+          "title": "Add new CloudEventsKafkaHeaders class for kafka API",
+          "url": "https://github.com/cloudevents/sdk-java/pull/90",
+          "created_at": "2020-01-28T15:05:47Z",
+          "merged_at": "2020-03-04T23:12:41Z"
+        }
+      ]
+    },
+    {
+      "repo": "confluentinc/schema-registry",
+      "repo_url": "https://github.com/confluentinc/schema-registry",
+      "prs": [
+        {
+          "number": 352,
+          "title": "Fix schemas.cache.config can't be overrided",
+          "url": "https://github.com/confluentinc/schema-registry/pull/352",
+          "created_at": "2016-06-10T10:15:26Z",
+          "merged_at": "2016-06-10T20:50:51Z"
+        }
+      ]
+    },
+    {
+      "repo": "fabric8io/kubernetes-client",
+      "repo_url": "https://github.com/fabric8io/kubernetes-client",
+      "prs": [
+        {
+          "number": 6213,
+          "title": "fix(client): improve reliability of file upload to pod (#6212)",
+          "url": "https://github.com/fabric8io/kubernetes-client/pull/6213",
+          "created_at": "2024-07-31T18:47:21Z",
+          "merged_at": "2024-08-06T10:18:47Z"
+        }
+      ]
+    },
+    {
+      "repo": "sdkman/sdkman-db-migrations",
+      "repo_url": "https://github.com/sdkman/sdkman-db-migrations",
+      "prs": [
+        {
+          "number": 661,
+          "title": "feat: add candidate jikkou",
+          "url": "https://github.com/sdkman/sdkman-db-migrations/pull/661",
+          "created_at": "2023-09-04T17:02:11Z",
+          "merged_at": "2023-10-06T15:46:22Z"
+        }
+      ]
+    }
+  ]
+}

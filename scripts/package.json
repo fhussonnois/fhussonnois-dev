@@ -1,0 +1,12 @@
+{
+  "name": "fhussonnois-dev-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch-contributions": "tsx fetch-contributions.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}

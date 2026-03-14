@@ -688,13 +688,48 @@ h3 { font-size: 1.25rem; }
   opacity: 0.8;
 }
 
-/* --- Section Pages (About/Projects/Conferences) --- */
+/* --- Section Pages (About/Projects/Conferences/Contributions) --- */
 .section-page {
   padding: 3rem 0;
 }
 
 .section-page .prose {
   max-width: 780px;
+}
+
+/* --- Contributions --- */
+.contribution-summary {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.contribution-repo {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.contribution-repo a {
+  color: var(--color-accent);
+}
+
+.contribution-count {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.kip-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  margin-left: 0.4rem;
+  vertical-align: middle;
 }
 
 /* --- Footer --- */
