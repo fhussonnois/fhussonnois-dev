@@ -1,6 +1,6 @@
 <article class="post-card">
   <a href="{{ .Permalink }}">
-    {{ $cover := .Params.cover }}
+    {{ $cover := .Params.image }}
     {{ if $cover }}
     <img class="post-card-cover" src="{{ $cover }}" alt="{{ .Title }}" loading="lazy">
     {{ else }}

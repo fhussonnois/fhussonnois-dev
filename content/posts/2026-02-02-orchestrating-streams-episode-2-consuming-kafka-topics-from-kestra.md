@@ -10,8 +10,8 @@ tags = [
     "open-source",
 ]
 draft = false
-description = "Learn how to consume Kafka topics from Kestra using polling triggers and real-time triggers, with hands-on examples and Docker Compose setup."
-cover = "/images/posts/robert-anderson-ALZb2Gv20TY-unsplash.jpg"
+description = "Learn how to consume Kafka topics from Kestra using polling triggers and real-time triggers, with hands-on Docker Compose examples."
+image = "/images/posts/robert-anderson-ALZb2Gv20TY-unsplash.jpg"
 +++
 
 ![Photo by Robert Anderson on Unsplash](/images/posts/robert-anderson-ALZb2Gv20TY-unsplash.jpg)

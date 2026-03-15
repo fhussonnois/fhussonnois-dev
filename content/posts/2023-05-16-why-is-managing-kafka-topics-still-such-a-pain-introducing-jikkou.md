@@ -10,8 +10,8 @@ tags = [
     "open source",
 ]
 draft = false
-description = "Introducing Jikkou, an open-source tool for managing Apache Kafka topics as code using a declarative, GitOps-friendly approach."
-cover = "/images/posts/jikkou-cover.jpg"
+description = "Introducing Jikkou, an open-source resource-as-code framework that solves the pain of managing Apache Kafka topics at scale with GitOps workflows."
+image = "/images/posts/jikkou-cover.jpg"
 +++
 
 ![Photo by Jon Cartagena on Unsplash](/images/posts/jikkou-cover.jpg)
