@@ -1,6 +1,6 @@
 +++
 title = "About — Florian Hussonnois, Apache Kafka Expert & Software Engineer"
-description = "Florian Hussonnois is a Lead Software Engineer at Kestra with 12+ years of experience in stream processing, Apache Kafka, and distributed architectures."
+description = "Florian Hussonnois is a Lead Software Engineer at Kestra with 12+ years of experience in stream processing, Apache Kafka, and distributed architectures. Confluent Community Catalyst 2019–2025. Based in Paris, France."
 date = "2025-01-01"
 aliases = ["about-us", "contact"]
 author = "Florian Hussonnois"

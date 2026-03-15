@@ -13,10 +13,10 @@
 {{/* Meta description with Summary fallback */}}
 {{ if .Description }}
   <meta name="description" content="{{ .Description }}">
-{{ else if .IsPage }}
-  <meta name="description" content="{{ .Summary | plainify | truncate 155 }}">
-{{ else }}
+{{ else if .IsHome }}
   <meta name="description" content="{{ .Site.Params.description }}">
+{{ else if .Summary }}
+  <meta name="description" content="{{ .Summary | plainify | truncate 155 }}">
 {{ end }}
 
 <meta name="author" content="{{ .Site.Params.author }}">
@@ -26,12 +26,12 @@
 
 {{/* Open Graph */}}
 <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
-<meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}">
+<meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | Florian Hussonnois{{ end }}">
 <meta property="og:description" content="{{ if .Description }}{{ .Description }}{{ else if .IsPage }}{{ .Summary | plainify | truncate 155 }}{{ else }}{{ .Site.Params.description }}{{ end }}">
 <meta property="og:url" content="{{ .Permalink }}">
 <meta property="og:site_name" content="{{ .Site.Title }}">
-{{ with .Params.cover }}
-  <meta property="og:image" content="{{ . | absURL }}">
+{{ if .Params.image }}
+  <meta property="og:image" content="{{ .Params.image | absURL }}">
 {{ else }}
   <meta property="og:image" content="{{ "images/avatar.png" | absURL }}">
 {{ end }}
@@ -49,8 +49,8 @@
 <meta name="twitter:creator" content="{{ .Site.Params.twitter }}">
 <meta name="twitter:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
 <meta name="twitter:description" content="{{ if .Description }}{{ .Description }}{{ else if .IsPage }}{{ .Summary | plainify | truncate 155 }}{{ else }}{{ .Site.Params.description }}{{ end }}">
-{{ with .Params.cover }}
-  <meta name="twitter:image" content="{{ . | absURL }}">
+{{ if .Params.image }}
+  <meta name="twitter:image" content="{{ .Params.image | absURL }}">
 {{ else }}
   <meta name="twitter:image" content="{{ "images/avatar.png" | absURL }}">
 {{ end }}
@@ -82,7 +82,7 @@
 </script>
 {{ end }}
 
-{{ if .IsPage }}
+{{ if and .IsPage (eq .Section "posts") }}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -92,7 +92,7 @@
   "url": "{{ .Permalink }}",
   "datePublished": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
   "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}",
-  {{ with .Params.cover }}"image": "{{ . | absURL }}",{{ end }}
+  {{ with .Params.image }}"image": "{{ . | absURL }}",{{ end }}
   "author": {
     "@type": "Person",
     "name": "Florian Hussonnois",
