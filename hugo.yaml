@@ -9,12 +9,6 @@ sitemap:
 defaultContentLanguage: "en"
 enableRobotsTXT: true
 
-social:
-  github: "https://github.com/fhussonnois"
-  twitter: "https://twitter.com/fhussonnois"
-  stackoverflow: "https://stackoverflow.com/users/3660859/fhussonnois"
-  linkedin: https://www.linkedin.com/in/florian-hussonnois/
-
 # Site parameters
 params:
   # Site Author
@@ -24,6 +18,11 @@ params:
   # Site Description, used in HTML meta
   description: "Florian Hussonnois — Lead Software Engineer at Kestra. Writing about Apache Kafka, data streaming, orchestration, and distributed system architectures."
   twitter: "@fhussonnois"
+  social:
+    github: "https://github.com/fhussonnois"
+    twitter: "https://twitter.com/fhussonnois"
+    stackoverflow: "https://stackoverflow.com/users/3660859/fhussonnois"
+    linkedin: https://www.linkedin.com/in/florian-hussonnois/
 
 markup:
   goldmark:

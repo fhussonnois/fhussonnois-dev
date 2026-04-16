@@ -1,16 +1,16 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer-socials">
-      {{ with .Site.Social.github }}
+      {{ with .Site.Params.social.github }}
       <a href="{{ . }}" target="_blank" rel="noopener" aria-label="GitHub">{{ partial "svgs/github.svg" }}</a>
       {{ end }}
-      {{ with .Site.Social.twitter }}
+      {{ with .Site.Params.social.twitter }}
       <a href="{{ . }}" target="_blank" rel="noopener" aria-label="Twitter">{{ partial "svgs/twitter.svg" }}</a>
       {{ end }}
-      {{ with .Site.Social.linkedin }}
+      {{ with .Site.Params.social.linkedin }}
       <a href="{{ . }}" target="_blank" rel="noopener" aria-label="LinkedIn">{{ partial "svgs/linkedin.svg" }}</a>
       {{ end }}
-      {{ with .Site.Social.stackoverflow }}
+      {{ with .Site.Params.social.stackoverflow }}
       <a href="{{ . }}" target="_blank" rel="noopener" aria-label="Stack Overflow">{{ partial "svgs/stackoverflow.svg" }}</a>
       {{ end }}
     </div>
