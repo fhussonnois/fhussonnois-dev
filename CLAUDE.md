@@ -13,13 +13,13 @@ Personal blog for fhussonnois.dev, built with Hugo and the [hugo-theme-mini](htt
 hugo server -D
 
 # Production build (same as CI)
-hugo --minify -v -s . -d ./public
+hugo --minify --logLevel info -s . -d ./public
 
 # Create a new blog post
 hugo new posts/slug.md
 ```
 
-Hugo version used in CI: **0.120.3** (extended).
+Hugo version used in CI: **0.160.1** (extended).
 
 ## Architecture
 
