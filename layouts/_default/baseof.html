@@ -14,5 +14,9 @@
   <script src="{{ $js.RelPermalink }}"></script>
   {{ $copyJs := resources.Get "js/code-copy.js" | minify | fingerprint }}
   <script src="{{ $copyJs.RelPermalink }}" defer></script>
+  {{ if and .IsPage (eq .Section "posts") }}
+  {{ $tocJs := resources.Get "js/post-toc.js" | minify | fingerprint }}
+  <script src="{{ $tocJs.RelPermalink }}" defer></script>
+  {{ end }}
 </body>
 </html>
