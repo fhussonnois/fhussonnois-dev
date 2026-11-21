@@ -401,17 +401,6 @@ h3 { font-size: 1.25rem; }
   color: var(--color-tag-text);
 }
 
-.post-card-excerpt {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 /* --- Single Post --- */
 .post-header {
   margin-bottom: 2rem;
