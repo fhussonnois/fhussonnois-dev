@@ -12,6 +12,7 @@ tags = [
 draft = false
 description = "Introducing Jikkou, an open-source resource-as-code framework that solves the pain of managing Apache Kafka topics at scale with GitOps workflows."
 image = "/images/posts/jikkou-cover.jpg"
+aliases = ["/posts/2023-05-16-why-is-managing-kafka-topics-still-such-a-pain-introducing-jikkou/"]
 +++
 
 ![Photo by Jon Cartagena on Unsplash](/images/posts/jikkou-cover.jpg)

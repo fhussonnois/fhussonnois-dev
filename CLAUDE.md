@@ -16,7 +16,7 @@ hugo server -D
 hugo --minify -v -s . -d ./public
 
 # Create a new blog post
-hugo new posts/YYYY-MM-DD-slug.md
+hugo new posts/slug.md
 ```
 
 Hugo version used in CI: **0.120.3** (extended).
@@ -36,7 +36,7 @@ Hugo version used in CI: **0.120.3** (extended).
 ## Content Conventions
 
 - Blog posts use **TOML front matter** (`+++` delimiters) with fields: `author`, `title`, `date` (YYYY-MM-DD), `tags`, `draft`
-- Post filenames follow the pattern: `YYYY-MM-DD-slug.md`
+- Post filenames are the plain slug (`slug.md`, no date prefix); the date lives in front matter. Renamed posts keep their old URL via `aliases`
 - Goldmark renderer is configured with `unsafe: true` to allow raw HTML in Markdown
 
 ## Deployment

@@ -9,6 +9,7 @@ tags = [
 draft = false
 description = "How to use JSONata in Kestra as a powerful expression language for JSON transformation — with real-world examples and tips."
 image = "/images/posts/jsonata-cover.jpg"
+aliases = ["/posts/2024-08-08-jsonata/"]
 +++
 
 ![Photo by Patrick on Unsplash](/images/posts/jsonata-cover.jpg)

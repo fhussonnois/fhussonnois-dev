@@ -12,6 +12,7 @@ tags = [
 draft = false
 description = "Step-by-step guide to producing data into Apache Kafka using the Kestra workflow orchestration platform, with practical open-source examples."
 image = "/images/posts/jeremy-bishop-zYkU9Q44Bzw-unsplash.jpg"
+aliases = ["/posts/2025-10-27-orchestrating-streams-episode-1-producing-data-from-kestra-to-kafka/"]
 +++
 
 ![Photo by Jeremy Bishop on Unsplash](/images/posts/jeremy-bishop-zYkU9Q44Bzw-unsplash.jpg)

@@ -12,6 +12,7 @@ tags = [
 draft = false
 description = "Learn how to consume Kafka topics from Kestra using polling triggers and real-time triggers, with hands-on Docker Compose examples."
 image = "/images/posts/robert-anderson-ALZb2Gv20TY-unsplash.jpg"
+aliases = ["/posts/2026-02-02-orchestrating-streams-episode-2-consuming-kafka-topics-from-kestra/"]
 +++
 
 ![Photo by Robert Anderson on Unsplash](/images/posts/robert-anderson-ALZb2Gv20TY-unsplash.jpg)

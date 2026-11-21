@@ -10,6 +10,7 @@ tags = [
 draft = false
 description = "How orchestration platforms like Kestra are rising to manage complexity in disaggregated software architectures and microservices ecosystems."
 image = "/images/posts/orchestration-cover.jpg"
+aliases = ["/posts/2024-06-04-orchestration/"]
 +++
 
 _This blog post was originally published on [Medium](https://medium.com/@fhussonnois/navigating-complexity-the-rise-of-orchestration-platforms-in-a-disaggregated-software-architecture-465b6f791f9c)_
