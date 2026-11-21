@@ -19,7 +19,13 @@
         {{ end }}
       </div>
       {{ end }}
-      <p class="post-card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
+      {{ $excerpt := .Description }}
+      {{ if not $excerpt }}
+        {{ $excerpt = .Summary | plainify | htmlUnescape }}
+        {{ $excerpt = replaceRE `(?i)^\s*Photo (by|de) .*? (on|sur) Unsplash\s*` "" $excerpt }}
+        {{ $excerpt = replaceRE `(?i)^\s*This blog post was originally published on Medium\s*` "" $excerpt }}
+      {{ end }}
+      <p class="post-card-excerpt">{{ $excerpt | truncate 150 }}</p>
     </div>
   </a>
 </article>
