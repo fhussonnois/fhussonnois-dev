@@ -4,10 +4,27 @@
 
 <div class="container">
   <h2 class="section-heading"><span class="hash">#</span> Latest Posts</h2>
-  <div class="post-grid">
-    {{ range where .Site.RegularPages "Section" "posts" }}
-    {{ partial "post-card.html" . }}
-    {{ end }}
+  {{ $years := (where .Site.RegularPages "Section" "posts").GroupByDate "2006" }}
+  <div class="posts-by-year">
+    <nav class="year-nav" aria-label="Posts by year">
+      <ul>
+        {{ range $years }}
+        <li><a href="#year-{{ .Key }}">{{ .Key }}</a></li>
+        {{ end }}
+      </ul>
+    </nav>
+    <div class="year-sections">
+      {{ range $years }}
+      <section class="year-section" id="year-{{ .Key }}" aria-labelledby="year-{{ .Key }}-heading">
+        <h3 class="year-heading" id="year-{{ .Key }}-heading">{{ .Key }}</h3>
+        <div class="post-grid">
+          {{ range .Pages }}
+          {{ partial "post-card.html" . }}
+          {{ end }}
+        </div>
+      </section>
+      {{ end }}
+    </div>
   </div>
 </div>
 

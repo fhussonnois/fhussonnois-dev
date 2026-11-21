@@ -810,10 +810,95 @@ h3 { font-size: 1.25rem; }
   opacity: 1;
 }
 
+/* --- Posts grouped by year (landing page) --- */
+.posts-by-year {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.year-sections {
+  min-width: 0;
+}
+
+.year-nav {
+  position: sticky;
+  top: calc(var(--nav-height) + 1.5rem);
+}
+
+.year-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-left: 1px solid var(--color-border);
+}
+
+.year-nav a {
+  display: block;
+  margin-left: -1px;
+  padding: 0.2rem 0.75rem;
+  border-left: 2px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.year-nav a:hover,
+.year-nav a:focus-visible {
+  color: var(--color-accent);
+  border-left-color: var(--color-accent);
+}
+
+.year-heading {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.year-section .post-grid {
+  margin-bottom: 2.5rem;
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   .post-grid {
     grid-template-columns: 1fr;
+  }
+
+  .posts-by-year {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .year-nav {
+    position: static;
+  }
+
+  .year-nav ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-left: 0;
+  }
+
+  .year-nav a {
+    margin-left: 0;
+    padding: 0.15rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+
+  .year-nav a:hover,
+  .year-nav a:focus-visible {
+    border-color: var(--color-accent);
   }
 
   .nav-links {
