@@ -1,0 +1,454 @@
+<!doctype html><html lang=en-us data-theme=light><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions | Florian Hussonnois</title><meta name=description content="Learn how to manage Kafka Schema Registry schemas using GitOps with Jikkou and GitHub Actions for automated, version-controlled deployments."><meta name=author content="Florian Hussonnois"><link rel=canonical href=https://www.fhussonnois.dev/posts/gitops-kafka-schema-management-jikkou-github-actions/><meta property="og:type" content="article"><meta property="og:title" content="GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions | Florian Hussonnois"><meta property="og:description" content="Learn how to manage Kafka Schema Registry schemas using GitOps with Jikkou and GitHub Actions for automated, version-controlled deployments."><meta property="og:url" content="https://www.fhussonnois.dev/posts/gitops-kafka-schema-management-jikkou-github-actions/"><meta property="og:site_name" content="Florian Hussonnois — Apache Kafka, Kestra & Data Streaming"><meta property="og:image" content="https://www.fhussonnois.dev/images/posts/gitops-kafka-jikkou-cover.jpg"><meta property="article:published_time" content="2023-10-03T00:00:00Z"><meta property="article:author" content="Florian Hussonnois"><meta property="article:tag" content="apache kafka"><meta property="article:tag" content="jikkou"><meta property="article:tag" content="data mesh"><meta property="article:tag" content="gitops"><meta property="article:tag" content="data architecture"><meta property="article:tag" content="data governance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:site content="@fhussonnois"><meta name=twitter:creator content="@fhussonnois"><meta name=twitter:title content="GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions"><meta name=twitter:description content="Learn how to manage Kafka Schema Registry schemas using GitOps with Jikkou and GitHub Actions for automated, version-controlled deployments."><meta name=twitter:image content="https://www.fhussonnois.dev/images/posts/gitops-kafka-jikkou-cover.jpg"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"GitOps \u0026 Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions","description":"Learn how to manage Kafka Schema Registry schemas using GitOps with Jikkou and GitHub Actions for automated, version-controlled deployments.","url":"https:\/\/www.fhussonnois.dev\/posts\/gitops-kafka-schema-management-jikkou-github-actions\/","datePublished":"2023-10-03T00:00:00Z","dateModified":"2023-10-03T00:00:00Z","image":"https:\/\/www.fhussonnois.dev\/images\/posts\/gitops-kafka-jikkou-cover.jpg","author":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev/about/"},"publisher":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev"},"keywords":["apache kafka","jikkou","data mesh","gitops","data architecture","data governance"]}</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel=stylesheet><script>(function(){var e=localStorage.getItem("theme");e==="dark"&&document.documentElement.setAttribute("data-theme","dark")})()</script><link rel=stylesheet href=/css/main.min.609ff1b5cd149b19c6eebb465010d9ef1dd831c368abb5c128051ea9d3d023f9.css><link rel=icon type=image/png href=/images/avatar.png></head><body><a class=skip-to-content href=#main-content>Skip to content</a><nav class=site-nav role=navigation aria-label="Main navigation"><div class=nav-inner><a class=nav-logo href=/><span class=prompt>>_</span> fhussonnois.dev</a><ul class=nav-links id=nav-links><li><a href=/posts/ aria-current=section>Blog</a></li><li><a href=/projects/>Projects</a></li><li><a href=/contributions/>Contributions</a></li><li><a href=/conferences/>Conferences</a></li><li><a href=/about/>About</a></li><li><a href=/tags/>Tags</a></li></ul><div class=nav-right><button class=theme-toggle aria-label="Toggle dark mode">
+<span class=icon-sun><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</span><span class=icon-moon><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</span></button>
+<button class=nav-toggle aria-label="Toggle menu" aria-expanded=false>
+<svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></nav><main id=main-content><article class=container><header class=post-header><h1 class=post-title>GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions</h1><div class=post-meta><time datetime=2023-10-03>October 3, 2023</time>
+<span>3492 words</span>
+<span>17 min read</span></div><div class=post-tags><a class=tag-pill href=/tags/apache-kafka/>apache kafka</a>
+<a class=tag-pill href=/tags/jikkou/>jikkou</a>
+<a class=tag-pill href=/tags/data-mesh/>data mesh</a>
+<a class=tag-pill href=/tags/gitops/>gitops</a>
+<a class=tag-pill href=/tags/data-architecture/>data architecture</a>
+<a class=tag-pill href=/tags/data-governance/>data governance</a></div></header><div class=prose><p><em>This blog post was originally published on <a href=https://medium.com/@fhussonnois/gitops-kafka-enabling-smooth-and-seamless-data-schema-management-with-jikkou-and-github-actions-d920a6a14bb target=_blank rel="noopener noreferrer">Medium</a></em></p><p><img src=/images/posts/gitops-kafka-jikkou-cover.jpg alt="Photo by Vighnesh Dudani on Unsplash" loading=lazy></p><p><em>Photo by <a href=https://unsplash.com/@vighneshd target=_blank rel="noopener noreferrer">Vighnesh Dudani</a>
+on <a href=https://unsplash.com target=_blank rel="noopener noreferrer">Unsplash</a></em></p><p>Data schemas are a fundamental part of the definition and documentation of the event streams in an event-driven platform such as <a href=https://kafka.apache.org/ target=_blank rel="noopener noreferrer">Apache Kafka</a>
+. Not only do schemas provide a clear definition of the field names, types, and defaults of the content of the data, but they also serve as a way to standardize data contracts between both producers and consumers.</p><p>Schemas provide a framework for managing and evolving data over time while offering teams communication and documentation support to ensure data discoverability. They are a cornerstone of your data governance strategy, and undoubtedly one of the most important aspects when it comes to initiating an <strong>Event-driven <a href=https://martinfowler.com/articles/data-mesh-principles.html target=_blank rel="noopener noreferrer">Data Mesh</a>
+</strong>.</p><blockquote><p>In brief, the governance of your schemas plays a decisive role in the success of your event-driven architecture.</p></blockquote><p>In the world of data streaming, the use of a <strong>Schema Registry</strong> service has become a de facto standard for all projects (at least, I hope so…). Schema Registry allows you to centralize all your schemas associated with your event streams (i.e., your topics) into a single repository. But, it also provides additional benefits such as ensuring that schemas remain valid and compatible. More generally, the Schema Registry supports the lifecycle of your schemas within your event-driven architecture.</p><p>The following diagram describes the life cycle of a schema in the Schema Registry, in line with the life cycle of your Data Product:</p><p><img src=/images/posts/gitops-kafka-jikkou-cover.jpg alt="Lifecycle of a Data Product&rsquo;s schema within a Schema Registry" loading=lazy></p><p><em>Lifecycle of a Data Product&rsquo;s schema within a Schema Registry</em></p><p>However, despite the importance of having well-defined schemas and evolution strategies, I&rsquo;ve seen in my humble experience, too many projects that lacked an efficient <strong>continuous integration (CI)</strong> and/or <strong>continuous delivery (CD)</strong> workflow to manage the lifecycle of their schemas in the Schema Registry.</p><p>In fact, in most cases, teams either make their applications responsible for registering the schema automatically when serializing new data or deploy them manually using the REST Schema Registry API or other fancy user interfaces to Kafka. While those approaches can be used in the early stages of a project, they do not provide reliable schema management.</p><p>In the worst case, sooner or later you run the risk of publishing data that is no longer consistent with the data contract shared with consumers. As a result, you may fail to meet your service level agreements (SLAs) and impact business due to broken data.</p><p>In this tech blog post, I propose to you a practical hands-on of how to manage your Schema Registry by adopting a <a href=https://www.gitops.tech/ target=_blank rel="noopener noreferrer">Gitops approach</a>
+. To do this, we are going to use <a href=https://github.com/features/actions target=_blank rel="noopener noreferrer">Github Actions</a>
+, <a href=https://github.com/streamthoughts/jikkou target=_blank rel="noopener noreferrer">Jikkou CLI</a>
+, and the <a href=https://aiven.io/ target=_blank rel="noopener noreferrer">Aiven</a>
+for Apache Kafka® managed service.</p><h2 id=jikkou-in-a-nutshell><a class=heading-anchor href=#jikkou-in-a-nutshell>#</a>Jikkou: in a nutshell</h2><p>Jikkou is an open-source tool built to provide an efficient and easy way to manage, automate, and provision resource configurations for your streaming platform, from Kafka Topics, ACLs, and Quotas to Schema Registry Subjects. At the time of writing, it supports all Kafka platforms compatible with the Admin Kafka API (i.e., <a href=https://kafka.apache.org/ target=_blank rel="noopener noreferrer">Apache Kafka</a>
+, <a href=https://aiven.io/ target=_blank rel="noopener noreferrer">Aiven</a>
+, <a href=https://aws.amazon.com/fr/msk/ target=_blank rel="noopener noreferrer">MSK</a>
+, <a href=https://www.confluent.io/confluent-cloud/ target=_blank rel="noopener noreferrer">Confluent Cloud</a>
+, <a href=https://redpanda.com/ target=_blank rel="noopener noreferrer">Redpanda</a>
+), and built-in support for Aiven.</p><p>It uses the concept of &ldquo;<strong>Resources</strong>&rdquo; to represent entities that reflect the state of specific aspects of your system, such as <em>Schema Registry Subject</em>. These resource definitions are described using standard <strong>YAML</strong> files, making them easy to create, version, share, and publish.</p><p>Finally, Jikkou adopts a <strong>stateless</strong> approach and thus does not store any state internally. Instead, it leverages your system as the source of truth. One benefit of this is that Jikkou doesn&rsquo;t require external dependencies to run.</p><blockquote><p><em>For an in-depth introduction, I highly recommend reading this first blog post: <a href=https://medium.com/@fhussonnois/why-is-managing-kafka-topics-still-such-a-pain-introducing-jikkou-b4e0a5d6c7c4 target=_blank rel="noopener noreferrer">Why is Managing Kafka Topics Still Such a Pain? Introducing Jikkou!</a></em></p></blockquote><h2 id=organizing-subject-schemas><a class=heading-anchor href=#organizing-subject-schemas>#</a>Organizing Subject Schemas</h2><p>Before we begin our practical example, perhaps there&rsquo;s a question you&rsquo;ve already asked yourself on one of your projects. <strong>How do you manage and organize all the data schemas in an event-driven architecture?</strong> To be honest, this is a topic that&rsquo;s way beyond the scope of this blog post. But, let&rsquo;s take a moment to discuss it!</p><p>I don&rsquo;t think there&rsquo;s any right or wrong way to organize your data schemas. What I do know is that there are different schools of thought, each with its own advantages and disadvantages.</p><p>Basically, you will find two main strategies: one is to <strong>centralize all of your schemas</strong> into some kind of monolith repository organized by business domains. Another is to <strong>decentralize</strong> and store schemas <strong>alongside producers&rsquo; code-base</strong>.</p><p>The first enables you to set up a single CI/CD providing common test and validation workflows for all of your schemas to guarantee the consistency and quality of the data being provided to your consumers while keeping data producers from publishing data.</p><p>In my humble opinion, and based on my various experiences, I think the truth lies somewhere in between. Since a picture is worth a thousand words, here&rsquo;s a diagram illustrating an organization that can be set up to manage schemas:</p><p><em>Managing schemas in Event-driven Data Mesh</em></p><blockquote><p>It&rsquo;s always a good idea to build and share reusable workflows with your data product teams, to make it easier to manage the lifecycle of your schemas.</p></blockquote><p>More generally, you will need to choose the solution that best suits your context and your target in terms of governance, while trying to respect some best practices. But, in any case, it&rsquo;s always a good idea to build and share reusable CI/CD workflows with your data product teams, to make it easier to manage the delivery process of their schemas.</p><p>Ok, that&rsquo;s cool, but, for this blog post, we will keep things simple!</p><h2 id=creating-a-first-schema><a class=heading-anchor href=#creating-a-first-schema>#</a>Creating A First Schema</h2><p>Since the beginning of this article, we&rsquo;ve been talking about data schemas. So why not create one?</p><p>First, let&rsquo;s create a single GitHub repository with the following hierarchy:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-fallback data-lang=fallback><span style=display:flex><span>|-- .github
+</span></span><span style=display:flex><span>|   └── workflows                # Github workflows
+</span></span><span style=display:flex><span>|       └── main.yml
+</span></span><span style=display:flex><span>|-- .jikkou                      # Jikkou CLI&#39;s config files
+</span></span><span style=display:flex><span>|   |-- aiven-kafka-service.conf
+</span></span><span style=display:flex><span>|   └── config.json
+</span></span><span style=display:flex><span>|-- resources                    # Folder for Jikkou resources (.yaml)
+</span></span><span style=display:flex><span>|   └── subject
+</span></span><span style=display:flex><span>└── schemas
+</span></span><span style=display:flex><span>    └── avro                     # Folder for Avro schemas (.avsc)
+</span></span></code></pre></div><p>Second, we&rsquo;re going to define a very simple schema using <a href=https://avro.apache.org/ target=_blank rel="noopener noreferrer">Apache Avro</a>
+format under the following path <code>schemas/avro/Person.avsc</code>:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;namespace&#34;</span>: <span style=color:#a6e3a1>&#34;com.example&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;type&#34;</span>: <span style=color:#a6e3a1>&#34;record&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;name&#34;</span>: <span style=color:#a6e3a1>&#34;Person&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;fields&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span>: <span style=color:#a6e3a1>&#34;id&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;type&#34;</span>: [ <span style=color:#a6e3a1>&#34;null&#34;</span>, <span style=color:#a6e3a1>&#34;int&#34;</span> ],
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;doc&#34;</span>: <span style=color:#a6e3a1>&#34;The person&#39;s unique ID&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;default&#34;</span>: <span style=color:#fab387>null</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span>: <span style=color:#a6e3a1>&#34;firstname&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;type&#34;</span>: [ <span style=color:#a6e3a1>&#34;null&#34;</span>, <span style=color:#a6e3a1>&#34;string&#34;</span> ],
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;default&#34;</span>: <span style=color:#fab387>null</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;doc&#34;</span>: <span style=color:#a6e3a1>&#34;The person&#39;s legal firstname.&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span>: <span style=color:#a6e3a1>&#34;lastname&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;type&#34;</span>: [ <span style=color:#a6e3a1>&#34;null&#34;</span>, <span style=color:#a6e3a1>&#34;string&#34;</span> ],
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;default&#34;</span>: <span style=color:#fab387>null</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;doc&#34;</span>: <span style=color:#a6e3a1>&#34; The person&#39;s legal lastname.&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span>: <span style=color:#a6e3a1>&#34;age&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;type&#34;</span>: [ <span style=color:#a6e3a1>&#34;null&#34;</span>, <span style=color:#a6e3a1>&#34;int&#34;</span> ],
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;default&#34;</span>: <span style=color:#fab387>null</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;doc&#34;</span>: <span style=color:#a6e3a1>&#34;The person&#39;s age.&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Note that <a href=https://avro.apache.org/ target=_blank rel="noopener noreferrer">Avro</a>
+is one of the most widely used serialization frameworks for Apache Kafka, along with <a href=https://protobuf.dev/ target=_blank rel="noopener noreferrer">Protobuf</a>
+, or <a href=https://www.json.org/ target=_blank rel="noopener noreferrer">JSON</a>
+. All those formats provide tooling for <em>code-generation</em> in different programming languages. Code generation allows you to automatically create classes that can be used both by producer and consumer applications. For Java, using Maven and the official <code>avro-maven-plugin</code> is a relatively common choice for compiling and publishing artifacts as part of your schema management workflow.</p><p>Third, let&rsquo;s create the following YAML file to declaratively register the schema in Schema Registry using Jikkou:</p><p><code>file: ./resources/subjects/person.yaml</code></p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;schemaregistry.jikkou.io/v1beta2&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;SchemaRegistrySubject&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># The Schema Subject Name</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;person&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>: {}
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>: {}
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>compatibilityLevel</span>: <span style=color:#a6e3a1>&#34;FULL_TRANSITIVE&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>schemaType</span>: <span style=color:#a6e3a1>&#34;AVRO&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>schema</span>:
+</span></span><span style=display:flex><span>    <span style=color:#6c7086;font-style:italic># The path must be relative to the root folder of the Github repository.</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>$ref</span>: ./schemas/avro/Person.avsc
+</span></span></code></pre></div><p>Jikkou uses the same resource model as Kubernetes to describe the entities to manage. This allows developers to quickly familiarize themselves with Jikkou without having to learn a new declarative language based on YAML.</p><blockquote><p><em>NOTE: Jikkou provides a built-in extension for Aiven to manage schemas directly via the Aiven REST API, rather than via the Schema Registry API, and thus requires an Aiven personal access token. For more information, see resources with <code>kafka.aiven.io/v1beta1</code>.</em></p></blockquote><h2 id=setting-up-jikkou-with-github-actions><a class=heading-anchor href=#setting-up-jikkou-with-github-actions>#</a>Setting up Jikkou with GitHub Actions</h2><p>For using Jikkou as part of our GitHub Actions workflow we will use the <a href=https://github.com/streamthoughts/setup-jikkou target=_blank rel="noopener noreferrer">jikkou-setup</a>
+Github Action. Basically, this action will be used for:</p><ul><li>Downloading a specific version of Jikkou CLI and adding it to the <code>PATH</code> of our running job.</li><li>Configuring Jikkou CLI with a custom configuration file and automatically setting up the <code>JIKKOUCONFIG</code> environment variable.</li></ul><p>Here is a very basic workflow we are going to start with (<code>.github/workflows/main.yml</code>):</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Main&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>branches</span>: [ main ]
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>pull_request</span>:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>pull-requests</span>: <span style=color:#a6e3a1>&#39;write&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>defaults</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>run</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>shell</span>: bash
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>JIKKOU_VERSION</span>: <span style=color:#a6e3a1>&#39;latest&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>build</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>name</span>: Validate and provision resources
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>runs-on</span>: ubuntu-latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Checkout GitHub repository&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>id</span>: checkout
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: actions/checkout@v4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Setup Jikkou&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>id</span>: jikkou-setup
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: streamthoughts/setup-jikkou@v0.2.0
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>jikkou_version</span>: ${{ env.JIKKOU_VERSION }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: jikkou-version
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>run</span>:
+</span></span><span style=display:flex><span>          jikkou --version
+</span></span></code></pre></div><p>For now, the workflow checks out the repository, installs the Jikkou binary, and displays the installed CLI version. Before moving on, let&rsquo;s add another step to check that our Apache Kafka® service is actually running.</p><h2 id=initializing-apache-kafka--schema-registry><a class=heading-anchor href=#initializing-apache-kafka--schema-registry>#</a>Initializing Apache Kafka & Schema Registry</h2><p>To run the following steps, you will need a running Kafka and Schema Registry services. Personally, I use <a href=https://aiven.io/ target=_blank rel="noopener noreferrer">Aiven</a>
+which provides a fully managed service for <strong>Apache Kafka®</strong>, but this should also work with any other managed services such as <a href=https://www.confluent.io/confluent-cloud/ target=_blank rel="noopener noreferrer">Confluent Cloud</a>
+.</p><p>To get started with a free trial, simply visit <a href=https://aiven.io/ target=_blank rel="noopener noreferrer">https://aiven.io/</a>
+and create an account. Once you&rsquo;ve created your account, you will obtain $300 in free credits. Then, proceed to create a new project and set up a new Apache Kafka service. For the purpose of this demo, you can select the <strong>Startup-2</strong> service plan (don&rsquo;t forget to enable the Schema Registry service).</p><p><em>Note: For detailed instructions on setting up an Apache Kafka service on Aiven, you can refer to this <a href=https://docs.aiven.io/docs/products/kafka/getting-started target=_blank rel="noopener noreferrer">documentation</a>
+.</em></p><h2 id=checking-apache-kafka-is-running><a class=heading-anchor href=#checking-apache-kafka-is-running>#</a>Checking Apache Kafka is Running</h2><blockquote><p><em>Note: The following steps can be skipped if you&rsquo;re not using Aiven for Apache Kafka.</em></p></blockquote><p>For this, we can use the <code>jikkou health</code> command with the <code>avnservice</code> health indicator as follows:</p><p>First, create the following Github Actions secrets with your Aiven project/services and access information:</p><ul><li><strong>AIVEN_KAFKA_PROJET</strong> : <code>&lt;Your_Kafka_Project_Name></code></li><li><strong>AIVEN_KAFKA_SERVICE</strong> : <code>&lt;Your_Kafka_Service_Name></code></li><li><strong>AIVEN_ACCESS_TOKEN</strong> : <code>&lt;Your Aiven Access Token></code></li></ul><p>Then, configure the Jikkou CLI using the following config files:</p><p><code>file: .jikkou/config.json</code> (JSON):</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;currentContext&#34;</span> : <span style=color:#a6e3a1>&#34;aiven&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;aiven&#34;</span> : {
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;configFile&#34;</span> : <span style=color:#a6e3a1>&#34;./.jikkou/aiven-kafka-service.conf&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;configProps&#34;</span> : {}
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>file: .jikkou/aiven-kafka-service.conf</code> (HOCON):</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span>jikkou {
+</span></span><span style=display:flex><span>  aiven {
+</span></span><span style=display:flex><span>    <span style=color:#6c7086;font-style:italic># Environment variables will override the corresponding config properties</span>
+</span></span><span style=display:flex><span>    project <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#89dceb;font-weight:700>$</span>{<span style=color:#f38ba8>?</span>AIVEN_KAFKA_PROJECT}
+</span></span><span style=display:flex><span>    service <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#89dceb;font-weight:700>$</span>{<span style=color:#f38ba8>?</span>AIVEN_KAFKA_SERVICE}
+</span></span><span style=display:flex><span>    tokenAuth <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#89dceb;font-weight:700>$</span>{<span style=color:#f38ba8>?</span>AIVEN_ACCESS_TOKEN}
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Finally, add the following step to our workflow:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#6c7086;font-style:italic># Your Aiven Project Name</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>AIVEN_KAFKA_PROJECT</span>: ${{ secrets.AIVEN_KAFKA_PROJECT }}
+</span></span><span style=display:flex><span>          <span style=color:#6c7086;font-style:italic># Your Aiven Service Name</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>AIVEN_KAFKA_SERVICE</span>: ${{ secrets.AIVEN_KAFKA_SERVICE }}
+</span></span><span style=display:flex><span>          <span style=color:#6c7086;font-style:italic># Your Aiven Access Token</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>AIVEN_ACCESS_TOKEN</span>: ${{ secrets.AIVEN_ACCESS_TOKEN }}
+</span></span></code></pre></div><p>When running the following workflow should output something similar to:</p><p><em>GitHub Actions — Jikkou</em></p><p>As you can see above, Jikkou lets you override your configuration properties with environment variables, which is useful when using secrets.</p><h2 id=validating-schemas><a class=heading-anchor href=#validating-schemas>#</a>Validating Schemas</h2><p>One of the main reasons for setting up a continuous integration pipeline is to be able to continuously test and validate changes to our schemas. We want to make sure that new or modified schemas satisfy our quality and compatibility requirements.</p><p>Compatibility checks can be performed by submitting a schema to the Schema Registry that will validate it against already registered schema versions for a given subject.</p><p>For this, we need to add the Schema Registry connection information with the following configuration settings:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-fallback data-lang=fallback><span style=display:flex><span>jikkou {
+</span></span><span style=display:flex><span>  #... omitted for clarity
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  # Schema Registry Connection information
+</span></span><span style=display:flex><span>  schemaRegistry {
+</span></span><span style=display:flex><span>    url = ${?SCHEMA_REGISTRY_URL}
+</span></span><span style=display:flex><span>    authMethod = basicauth
+</span></span><span style=display:flex><span>    basicAuthUser = ${?SCHEMA_REGISTRY_AUTH_USER}
+</span></span><span style=display:flex><span>    basicAuthPassword = ${?SCHEMA_REGISTRY_AUTH_PASSWORD}
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><blockquote><p><em>Note: As before, all sensitive configuration properties must be defined as action secrets and passed on via environment variables.</em></p></blockquote><p>Next, Jikkou allows you to configure some validation rules to ensure that the resources described match your expectations.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-zed data-lang=zed><span style=display:flex><span>jikkou {
+</span></span><span style=display:flex><span>    <span style=color:#f38ba8>#</span>... omitted for clarity
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f38ba8>#</span> Validation Rules
+</span></span><span style=display:flex><span>    validations <span style=color:#89dceb;font-weight:700>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        <span style=color:#f38ba8>#</span> Test the compatibility of the schema with the latest version
+</span></span><span style=display:flex><span>        <span style=color:#f38ba8>#</span> already registered in the Schema Registry with the given compatibility level.
+</span></span><span style=display:flex><span>        name <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#f38ba8>&#34;</span>checkSchemaCompatibility<span style=color:#f38ba8>&#34;</span>
+</span></span><span style=display:flex><span>        type <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#f38ba8>&#34;</span>io.streamthoughts.jikkou.schema.registry.validation.SchemaCompatibilityValidation<span style=color:#f38ba8>&#34;</span>
+</span></span><span style=display:flex><span>        config <span style=color:#89dceb;font-weight:700>=</span> {}
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        <span style=color:#f38ba8>#</span> Check that Avro Schemas conform to specific schema <span style=color:#f38ba8>definition</span> rules.
+</span></span><span style=display:flex><span>        name <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#f38ba8>&#34;</span>avroSchemaValidation<span style=color:#f38ba8>&#34;</span>
+</span></span><span style=display:flex><span>        type <span style=color:#89dceb;font-weight:700>=</span> <span style=color:#f38ba8>&#34;</span>io.streamthoughts.jikkou.schema.registry.validation.AvroSchemaValidation<span style=color:#f38ba8>&#34;</span>
+</span></span><span style=display:flex><span>        config <span style=color:#89dceb;font-weight:700>=</span> {
+</span></span><span style=display:flex><span>          <span style=color:#f38ba8>#</span> Verify that all record fields have a doc property.
+</span></span><span style=display:flex><span>          fieldsMustHaveDoc <span style=color:#89dceb;font-weight:700>=</span> true
+</span></span><span style=display:flex><span>          <span style=color:#f38ba8>#</span> Verify that all record fields are nullable.
+</span></span><span style=display:flex><span>          fieldsMustBeNullable <span style=color:#89dceb;font-weight:700>=</span> true
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Then, we can enrich our GitHub <em>workflow</em> with a validating step that will execute the <code>jikkou validate</code> command:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Validate Schemas&#39;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>id</span>: jikkou-validate
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou validate --files ./resources/subjects --file-name &#39;**/*.yaml&#39;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>SCHEMA_REGISTRY_URL</span>: ${{ secrets.SCHEMA_REGISTRY_URL }}
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_USER</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_USER }}
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_PASSWORD</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_PASSWORD }}
+</span></span></code></pre></div><p>By default, the <code>setup-jikkou</code> Github Action installs a wrapper script to wrap calls of the Jikkou CLI binary to expose its <code>STDOUT</code>, <code>STDERR</code>, and exit code as outputs named <code>stdout</code>, <code>stderr</code>, and <code>exitcode</code> respectively.</p><p>This allows you, for example, to write the <code>STDOUT</code> to a file that will be passed on to subsequent Jikkou calls, or provide feedback to your developers.</p><p>Finally, let&rsquo;s use those <em>outputs</em> to create a comment when a <em>Pull Request (PR)</em> is opened or updated depending on the result of the validation step:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Comment PR (Success)&#39;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>uses</span>: actions/github-script@v6
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>if</span>: github.event_name == &#39;pull_request&#39;
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>github-token</span>: ${{ secrets.GITHUB_TOKEN }}
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>script</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          github.rest.issues.createComment({
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            issue_number: context.issue.number,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            owner: context.repo.owner,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            repo: context.repo.repo,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            body: `Validation succeeded! ✅
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            **STDOUT**
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            \`\`\`yaml
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            ${{ steps.jikkou-validate.outputs.stdout }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          `})</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Comment PR (Failure)&#39;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>uses</span>: actions/github-script@v6
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>if</span>: failure() &amp;&amp; github.event_name == &#39;pull_request&#39; &amp;&amp; steps.jikkou-validate.outputs.exitcode != &#39;0&#39;
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>github-token</span>: ${{ secrets.GITHUB_TOKEN }}
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>script</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          github.rest.issues.createComment({
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            issue_number: context.issue.number,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            owner: context.repo.owner,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            repo: context.repo.repo,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            body: `Validation failed! ❌
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            **STDERR**
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            ${{ steps.jikkou-validate.outputs.stderr }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          `})</span>
+</span></span></code></pre></div><p>Here are some examples of what to expect with the steps added above:</p><p><em>Jikkou — GitHub Action — Validation Failed</em></p><p><em>Jikkou — GitHub Action — Validation Succeed</em></p><h2 id=registering-schemas><a class=heading-anchor href=#registering-schemas>#</a>Registering Schemas</h2><p>Now, that we are able to test and validate our schema all we need to do is to create a workflow to release and deploy it into the Schema Registry.</p><p>For this, we will create a <a href=https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch target=_blank rel="noopener noreferrer">dispatch workflow</a>
+name <code>release.yml</code> that can be triggered manually using the Actions tab on GitHub, GitHub CLI, or the REST API.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># .github/workflows/release.yml</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>name</span>: Release
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>workflow_dispatch</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputs</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>version</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Release version&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>required</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>next</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Next version&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>required</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>release</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>runs-on</span>: ubuntu-latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Checkout GitHub repository&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: actions/checkout@v4
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>clean</span>: <span style=color:#fab387>true</span>
+</span></span></code></pre></div><p>Next, we need to define steps to setup Jikkou and to call the <code>jikkou update</code> command. The <code>update</code> command will reconcile our Schema Registry with our local resources by creating and updating new and modified schemas:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Setup Jikkou</span>
+</span></span><span style=display:flex><span>- <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Setup Jikkou&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>uses</span>: streamthoughts/setup-jikkou@v0.2.0
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>jikkou_version</span>: ${{ env.JIKKOU_VERSION }}
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>jikkou_config</span>: ${{ env.JIKKOU_CONFIG }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Validate and apply changes</span>
+</span></span><span style=display:flex><span>- <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Deploy Schemas&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>id</span>: deploy
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    jikkou apply --files ./resources/subjects --file-name &#39;**/*.yaml&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>SCHEMA_REGISTRY_URL</span>: ${{ secrets.SCHEMA_REGISTRY_URL }}
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_USER</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_USER }}
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_PASSWORD</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_PASSWORD }}
+</span></span></code></pre></div><p>Then, to create the GitHub Release and Changelogs:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: Run JReleaser
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>uses</span>: jreleaser/release-action@v2
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>arguments</span>: <span style=color:#a6e3a1>&#34;release --auto-config&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>JRELEASER_PROJECT_NAME</span>: my-project-name
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>JRELEASER_PROJECT_VERSION</span>: ${{ github.event.inputs.version }}
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>JRELEASER_GITHUB_TOKEN</span>: ${{ secrets.GITHUB_TOKEN }}
+</span></span></code></pre></div><p>Finally, to be able to check the behavior of our release process, we can save the Jikkou&rsquo;s outputs as job artifacts.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Write STDOUT &amp; STDERR to log files</span>
+</span></span><span style=display:flex><span>- <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Save Jikkou Output&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>if</span>: always()
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    cat &lt;&lt; EOF &gt; jikkou.stdout.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    ${{ steps.deploy.outputs.stdout }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    EOF
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    cat &lt;&lt; EOF &gt; jikkou.stderr.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    ${{ steps.deploy.outputs.stderr }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Persist logs</span>
+</span></span><span style=display:flex><span>- <span style=color:#cba6f7>name</span>: Jikkou execution output
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>if</span>: always()
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>uses</span>: actions/upload-artifact@v3
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>name</span>: jikkou-deploy
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>path</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>      jikkou.stdout.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>      jikkou.stderr.log</span>
+</span></span></code></pre></div><p>Artifacts can be downloaded from the Github Actions Summary tab.</p><p>For our first release, the artifact <code>jikkou-deploy</code> should contain a file <code>jikkou.stoud.log</code> with the following content:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>[<span style=color:#f38ba8>TASK</span> [<span style=color:#f38ba8>ADD</span>] <span style=color:#f38ba8>Add</span> <span style=color:#f38ba8>subject</span> <span style=color:#f38ba8>&#39;Person&#39;</span> <span style=color:#f38ba8>(type=ADD</span>, <span style=color:#f38ba8>compatibilityLevel=FULL_TRANSITIVE)</span>
+</span></span><span style=display:flex><span>[{
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;status&#34;</span> : <span style=color:#a6e3a1>&#34;CHANGED&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;changed&#34;</span> : <span style=color:#fab387>true</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;failed&#34;</span> : <span style=color:#fab387>false</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;end&#34;</span> : <span style=color:#fab387>1696334309262</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;data&#34;</span> : {
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;apiVersion&#34;</span> : <span style=color:#a6e3a1>&#34;schemaregistry.jikkou.io/v1beta2&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;kind&#34;</span> : <span style=color:#a6e3a1>&#34;SchemaSubjectChange&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;metadata&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span> : <span style=color:#a6e3a1>&#34;Person&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;labels&#34;</span> : { },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;annotations&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;jikkou.io/resource-location&#34;</span> : <span style=color:#a6e3a1>&#34;file:///home/runner/work/jikkou-gitops-demo/jikkou-gitops-demo/./resources/subj...&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;change&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;subject&#34;</span> : <span style=color:#a6e3a1>&#34;Person&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;compatibilityLevels&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;FULL_TRANSITIVE&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;schema&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;{\&#34;doc\&#34;:\&#34;Personal Identifiable Information (PII)\&#34;,\&#34;fields\&#34;:[{\&#34;default\&#34; :null,\&#34;doc\&#34;:\&#34;The person&#39;s uni...&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;references&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : [ ],
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}]
+</span></span><span style=display:flex><span>[<span style=color:#f38ba8>EXECUTION</span> <span style=color:#f38ba8>in</span> <span style=color:#fab387>1</span><span style=color:#f38ba8>s</span> <span style=color:#fab387>99</span><span style=color:#f38ba8>ms</span>
+</span></span><span style=display:flex><span>[<span style=color:#f38ba8>ok</span> <span style=color:#f38ba8>:</span> <span style=color:#fab387>0</span>, <span style=color:#f38ba8>created</span> <span style=color:#f38ba8>:</span> <span style=color:#fab387>1</span>, <span style=color:#f38ba8>altered</span> <span style=color:#f38ba8>:</span> <span style=color:#fab387>0</span>, <span style=color:#f38ba8>deleted</span> <span style=color:#f38ba8>:</span> <span style=color:#fab387>0</span> <span style=color:#f38ba8>failed</span> <span style=color:#f38ba8>:</span> <span style=color:#fab387>0</span>
+</span></span></code></pre></div><p>Here is the complete workflow:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># .github/workflows/release.yml</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>name</span>: Release
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>workflow_dispatch</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputs</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>version</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Release version&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>required</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>next</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Next version&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>required</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>JIKKOU_VERSION</span>: <span style=color:#a6e3a1>&#39;latest&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>JIKKOU_CONFIG</span>: <span style=color:#a6e3a1>&#39;./.jikkou/config.json&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>release</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>runs-on</span>: ubuntu-latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Checkout GitHub repository&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: actions/checkout@v4
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>clean</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>          <span style=color:#6c7086;font-style:italic># required for JReleaser to work properly</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Setup Jikkou&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: streamthoughts/setup-jikkou@v0.2.0
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>jikkou_version</span>: ${{ env.JIKKOU_VERSION }}
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>jikkou_config</span>: ${{ env.JIKKOU_CONFIG }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># Validate and apply changes</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Deploy Schemas&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>id</span>: deploy
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          jikkou update --files ./resources/subjects --file-name &#39;**/*.yaml&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>SCHEMA_REGISTRY_URL</span>: ${{ secrets.SCHEMA_REGISTRY_URL }}
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_USER</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_USER }}
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_PASSWORD</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_PASSWORD }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># Write STDOUT &amp; STDERR to log files</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Save Jikkou Output&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>if</span>: always()
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          cat &lt;&lt; EOF &gt; jikkou.stdout.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          ${{ steps.deploy.outputs.stdout }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          EOF
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          cat &lt;&lt; EOF &gt; jikkou.stderr.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          ${{ steps.deploy.outputs.stderr }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># Create a release</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Configure Git&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          git config --global user.email &#34;41898282+github-actions[bot]@users.noreply.github.com&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          git config --global user.name &#34;github-actions[bot]&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Update version&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>id</span>: version
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          echo &#34;${{ github.event.inputs.next }}&#34; &gt;&gt; VERSION
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          git add VERSION
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          git commit -m &#34;ci: releasing version ${{ env.RELEASE_VERSION }} 🎉&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          git push --atomic origin HEAD:main
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          HEAD=$(git rev-parse HEAD)
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          echo &#34;HEAD=$HEAD&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          echo &#34;RELEASE_VERSION=$RELEASE_VERSION&#34; &gt;&gt; $GITHUB_OUTPUT</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: Run JReleaser
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: jreleaser/release-action@v2
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>arguments</span>: <span style=color:#a6e3a1>&#34;release --auto-config&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>JRELEASER_PROJECT_NAME</span>: jikkou-gitops-demo
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>JRELEASER_PROJECT_VERSION</span>: ${{ github.event.inputs.version }}
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>JRELEASER_GITHUB_TOKEN</span>: ${{ secrets.GITHUB_TOKEN }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;JReleaser output&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>if</span>: always()
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: actions/upload-artifact@v3
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>name</span>: jreleaser-release
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>path</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            out/jreleaser/trace.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            out/jreleaser/output.properties</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>name</span>: Jikkou execution output
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>if</span>: always()
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>uses</span>: actions/upload-artifact@v3
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>name</span>: jikkou-deploy
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>path</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            jikkou.stdout.log
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            jikkou.stderr.log</span>
+</span></span></code></pre></div><h2 id=deleting-schema><a class=heading-anchor href=#deleting-schema>#</a>Deleting Schema</h2><p>As we approach the end of this blog post, there&rsquo;s one more subject to deal with. How to perform schema deletion?</p><p>At some point, you may decide to deprecate and/or delete one of your event streams. There are several reasons for this. Maybe it&rsquo;s no longer being used by any consumers, so there&rsquo;s no need to maintain it. Or, you&rsquo;re planning to replace it with a new one having a non-compatible data model.</p><p>All Schema Registry solutions offer a schema deletion function. Some support hard deletion only, while others support both soft and hard deletion.</p><p>First, to delete all the versions of a given subject schema, all you have to do is to add the <code>jikkou.io/delete: true</code> annotation to your resource.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;schemaregistry.jikkou.io/v1beta2&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;SchemaRegistrySubject&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># The Schema Subject Name</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;person&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>: {}
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>jikkou.io/delete</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>compatibilityLevel</span>: <span style=color:#a6e3a1>&#34;FULL_TRANSITIVE&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>schemaType</span>: <span style=color:#a6e3a1>&#34;AVRO&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>schema</span>:
+</span></span><span style=display:flex><span>    <span style=color:#6c7086;font-style:italic># The path must be relative to the root folder of the Github repository.</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>$ref</span>: ./schemas/avro/Person.avsc
+</span></span></code></pre></div><p>Then, we can create a workflow with a step running the <code>jikkou delete</code> command. Eventually, we could only execute this workflow when commit message starts with a <code>delete:</code> prefix.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Delete subject schemas</span>
+</span></span><span style=display:flex><span>- <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;Delete Schemas&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>if</span>: startsWith(github.event.head_commit.message, &#39;delete:&#39;)
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>id</span>: deploy
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>run</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>    jikkou delete --files ./resources/subjects --file-name &#39;**/*.yaml&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>SCHEMA_REGISTRY_URL</span>: ${{ secrets.SCHEMA_REGISTRY_URL }}
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_USER</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_USER }}
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>SCHEMA_REGISTRY_AUTH_PASSWORD</span>: ${{ secrets.SCHEMA_REGISTRY_AUTH_PASSWORD }}
+</span></span></code></pre></div><p>The behavior of this execution will depend on your Schema Registry provider. By default, Jikkou will run a soft delete for Schema Registry supporting it and a hard delete for the others.</p><p>You can use the <code>schemaregistry.jikkou.io/permanante-delete</code> to specify a hard delete of the subject. Usually, you will perform a soft delete first, then the hard delete.</p><p>And that&rsquo;s it! We&rsquo;ve just created a simple and efficient process to validate, deploy, and deprecate our schemas for our event-driven architecture.</p><h2 id=conclusion><a class=heading-anchor href=#conclusion>#</a>Conclusion</h2><p>In conclusion, we have seen how important it is to define a clear and efficient strategy for managing event schemas. Adopting a GitOps approach enables developers to benefit from a reliable, smooth, and seamless experience as they work to create and manage data.</p><p>In my experience, the schema validation and deployment workflow should be kept as simple and flexible as possible for developers, while providing a minimum set of rules and constraints to guarantee the consistency and data quality of your self-serve platform. It should enable developers to focus on how to create and evolve the perfect data model to meet their business challenges, without worrying about how it will be deployed in the Schema Registry.</p><p>Jikkou was designed exactly with this in mind. The <code>jikkou-setup</code> GitHub Action makes it easy to integrate into your GitHub action workflows.</p><p>I hope you&rsquo;ve enjoyed this article and that some of you will find it useful.</p><p>If you find the Jikkou project valuable, I kindly ask you to show your support by sharing this article and spreading the word. You can even show your support by giving a star on the <a href=https://github.com/streamthoughts/jikkou target=_blank rel="noopener noreferrer">GitHub</a>
+repository.</p><p>We also welcome contributions from the community. If you have any ideas or specific project needs, please feel free to reach out and propose them. You can actively contribute to the project by creating <a href=https://github.com/streamthoughts/jikkou/pulls target=_blank rel="noopener noreferrer">pull requests</a>
+(PR).</p><p><strong>Thank you very much.</strong></p></div><nav class=post-nav><a class=prev href=https://www.fhussonnois.dev/posts/jikkou-declarative-acls-configuration-for-apache-kafka-and-schema-registry-on-aiven/>Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven</a>
+<a class=next href=https://www.fhussonnois.dev/posts/kafka-connect-jikkou-easily-manage-kafka-connectors/>Kafka Connect + Jikkou: Easily manage Kafka connectors</a></nav></article></main><footer class=site-footer><div class=container><div class=footer-socials><a href=https://github.com/fhussonnois target=_blank rel=noopener aria-label=GitHub><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg>
+</a><a href=https://twitter.com/fhussonnois target=_blank rel=noopener aria-label=Twitter><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1.0 3-1.2 3-1.2z"/></svg>
+</a><a href=https://www.linkedin.com/in/florian-hussonnois/ target=_blank rel=noopener aria-label=LinkedIn><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+</a><a href=https://stackoverflow.com/users/3660859/fhussonnois target=_blank rel=noopener aria-label="Stack Overflow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 20V12"/><path d="M20 20V12"/><path d="M7 17h10"/><path d="M7.5 13.5l9.2 1.8"/><path d="M8.8 10.1l8.5 3.9"/><path d="M11 7l7.1 5.8"/></svg></a></div><p class=footer-prompt><span class=prompt>>_</span> &copy; 2026 Florian Hussonnois</p></div></footer><script src=/js/theme-toggle.min.8c15e1b03ddad9066a2d55e38fe897951bafbc6b24db02de0ea1d219296def11.js></script></body></html>

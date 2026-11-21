@@ -1,0 +1,203 @@
+<!doctype html><html lang=en-us data-theme=light><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven | Florian Hussonnois</title><meta name=description content="Learn how to use Jikkou to declaratively manage ACL entries for Apache Kafka topics and Schema Registry on Aiven using GitOps-style workflows."><meta name=author content="Florian Hussonnois"><link rel=canonical href=https://www.fhussonnois.dev/posts/jikkou-declarative-acls-configuration-for-apache-kafka-and-schema-registry-on-aiven/><meta property="og:type" content="article"><meta property="og:title" content="Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven | Florian Hussonnois"><meta property="og:description" content="Learn how to use Jikkou to declaratively manage ACL entries for Apache Kafka topics and Schema Registry on Aiven using GitOps-style workflows."><meta property="og:url" content="https://www.fhussonnois.dev/posts/jikkou-declarative-acls-configuration-for-apache-kafka-and-schema-registry-on-aiven/"><meta property="og:site_name" content="Florian Hussonnois — Apache Kafka, Kestra & Data Streaming"><meta property="og:image" content="https://www.fhussonnois.dev/images/posts/jikkou-aiven-acls/cover.jpg"><meta property="article:published_time" content="2023-08-02T00:00:00Z"><meta property="article:author" content="Florian Hussonnois"><meta property="article:tag" content="apache kafka"><meta property="article:tag" content="jikkou"><meta property="article:tag" content="aiven"><meta property="article:tag" content="acl"><meta property="article:tag" content="schema registry"><meta property="article:tag" content="gitops"><meta property="article:tag" content="open source"><meta name=twitter:card content="summary_large_image"><meta name=twitter:site content="@fhussonnois"><meta name=twitter:creator content="@fhussonnois"><meta name=twitter:title content="Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven"><meta name=twitter:description content="Learn how to use Jikkou to declaratively manage ACL entries for Apache Kafka topics and Schema Registry on Aiven using GitOps-style workflows."><meta name=twitter:image content="https://www.fhussonnois.dev/images/posts/jikkou-aiven-acls/cover.jpg"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven","description":"Learn how to use Jikkou to declaratively manage ACL entries for Apache Kafka topics and Schema Registry on Aiven using GitOps-style workflows.","url":"https:\/\/www.fhussonnois.dev\/posts\/jikkou-declarative-acls-configuration-for-apache-kafka-and-schema-registry-on-aiven\/","datePublished":"2023-08-02T00:00:00Z","dateModified":"2023-08-02T00:00:00Z","image":"https:\/\/www.fhussonnois.dev\/images\/posts\/jikkou-aiven-acls\/cover.jpg","author":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev/about/"},"publisher":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev"},"keywords":["apache kafka","jikkou","aiven","acl","schema registry","gitops","open source"]}</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel=stylesheet><script>(function(){var e=localStorage.getItem("theme");e==="dark"&&document.documentElement.setAttribute("data-theme","dark")})()</script><link rel=stylesheet href=/css/main.min.609ff1b5cd149b19c6eebb465010d9ef1dd831c368abb5c128051ea9d3d023f9.css><link rel=icon type=image/png href=/images/avatar.png></head><body><a class=skip-to-content href=#main-content>Skip to content</a><nav class=site-nav role=navigation aria-label="Main navigation"><div class=nav-inner><a class=nav-logo href=/><span class=prompt>>_</span> fhussonnois.dev</a><ul class=nav-links id=nav-links><li><a href=/posts/ aria-current=section>Blog</a></li><li><a href=/projects/>Projects</a></li><li><a href=/contributions/>Contributions</a></li><li><a href=/conferences/>Conferences</a></li><li><a href=/about/>About</a></li><li><a href=/tags/>Tags</a></li></ul><div class=nav-right><button class=theme-toggle aria-label="Toggle dark mode">
+<span class=icon-sun><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</span><span class=icon-moon><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</span></button>
+<button class=nav-toggle aria-label="Toggle menu" aria-expanded=false>
+<svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></nav><main id=main-content><article class=container><header class=post-header><h1 class=post-title>Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven</h1><div class=post-meta><time datetime=2023-08-02>August 2, 2023</time>
+<span>1468 words</span>
+<span>7 min read</span></div><div class=post-tags><a class=tag-pill href=/tags/apache-kafka/>apache kafka</a>
+<a class=tag-pill href=/tags/jikkou/>jikkou</a>
+<a class=tag-pill href=/tags/aiven/>aiven</a>
+<a class=tag-pill href=/tags/acl/>acl</a>
+<a class=tag-pill href=/tags/schema-registry/>schema registry</a>
+<a class=tag-pill href=/tags/gitops/>gitops</a>
+<a class=tag-pill href=/tags/open-source/>open source</a></div></header><div class=prose><p><img src=/images/posts/jikkou-aiven-acls/cover.jpg alt="Photo by iMattSmart on Unsplash" loading=lazy></p><p><em>Photo by <a href=https://unsplash.com/@imattsmart target=_blank rel="noopener noreferrer">iMattSmart</a>
+on <a href=https://unsplash.com target=_blank rel="noopener noreferrer">Unsplash</a></em></p><p>Whether you&rsquo;ve been running <strong>Apache Kafka</strong> in production for a few days or a while, you should be aware that creating and managing topics, Access Control, Schemas, etc. by hand is tedious and error-prone.</p><p>A better approach is to rely on <strong>declarative configuration</strong>, <strong>revision control</strong> and <strong>automation</strong> to build repeatable and traceable workflows for managing the things of your data streaming platform. In other words, <a href=https://github.blog/2023-06-02-applying-gitops-principles-to-your-operations/ target=_blank rel="noopener noreferrer"><strong>GitOps-style</strong></a>
+is the way!</p><p>And of course, <a href=https://streamthoughts.github.io/jikkou/ target=_blank rel="noopener noreferrer"><strong>Jikkou</strong></a>
+is one of the tools specially designed for that purpose.</p><blockquote><p>For an introduction to Jikkou, I highly recommend reading this first blog post: <a href=https://medium.com/@fhussonnois/why-is-managing-kafka-topics-still-such-a-pain-introducing-jikkou-4ee9d5df948 target=_blank rel="noopener noreferrer"><strong>Why is Managing Kafka Topics Still Such a Pain? Introducing Jikkou!</strong></a></p></blockquote><p>The latest versions of Jikkou have introduced several new features, including support for managing Schema Registry, and Access Control for <a href=https://aiven.io/kafka target=_blank rel="noopener noreferrer"><strong>Aiven</strong></a>
+managed service for Apache Kafka.</p><p>In this short blog post, I propose to review these new features and explore how you can use them in your everyday projects.</p><h2 id=acls-for-kafka-topics-aiven><a class=heading-anchor href=#acls-for-kafka-topics-aiven>#</a>ACLs For Kafka Topics (Aiven)</h2><p>Before Jikkou v0.24.0, it was already possible to manage the ACLs of a Kafka cluster by defining a resource of type: <code>kafka.jikkou.io/v1beta2:KafkaPrincipalAuhtorization</code></p><p>However, it was not possible to directly manage ACLs on Kafka Cluster managed by Aiven due to some restrictions. In fact, Aiven uses custom <a href=https://github.com/Aiven-Open/auth-for-apache-kafka target=_blank rel="noopener noreferrer">Authentication and Authorization Plugins for Apache Kafka</a>
+which, unfortunately, does not support the creation or deletion of ACL entries yet.</p><p>Since Jikkou integrates directly with the <a href=https://api.aiven.io/doc/#tag/Service:_Kafka target=_blank rel="noopener noreferrer"><strong>Aiven API</strong></a>
+to manage ACL entries for Kafka topics and Schema Registry.</p><p>So, let&rsquo;s have a look at these new capabilities!</p><h3 id=step-1-install-and-configure-jikkou-cli><a class=heading-anchor href=#step-1-install-and-configure-jikkou-cli>#</a>Step 1: Install and configure Jikkou CLI</h3><p>First, download and install the latest release of Jikkou. For Debian, run the following commands to install the latest version:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>wget https://github.com/streamthoughts/jikkou/releases/download/v0.24.0/jikkou.deb <span style=color:#89dceb;font-weight:700>&amp;&amp;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>sudo dpkg -i jikkou.deb <span style=color:#89dceb;font-weight:700>&amp;&amp;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span><span style=color:#89dceb>source</span> &lt;<span style=color:#89dceb;font-weight:700>(</span>jikkou generate-completion<span style=color:#89dceb;font-weight:700>)</span> <span style=color:#89dceb;font-weight:700>&amp;&amp;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>jikkou --version
+</span></span></code></pre></div><p><em>Note: You can follow the following instructions to install it from a tarball distribution (<a href=https://streamthoughts.github.io/jikkou/docs/introduction/installation/#install-from-tarball-distribution target=_blank rel="noopener noreferrer">see doc</a>
+).</em></p><h3 id=step-2-configure><a class=heading-anchor href=#step-2-configure>#</a>Step 2: Configure</h3><p>To configure Jikkou CLI, let&rsquo;s create a new configuration context called <code>aiven-demo</code> with the following command. You will need to adapt it with your Aiven information.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou config set-context aiven-demo <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --config-props<span style=color:#89dceb;font-weight:700>=</span>aiven.project<span style=color:#89dceb;font-weight:700>=</span>&lt;AIVEN_PROJECT_NAME&gt;<span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --config-props<span style=color:#89dceb;font-weight:700>=</span>aiven.service<span style=color:#89dceb;font-weight:700>=</span>&lt;AIVEN_SERVICE_NAME&gt; <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --config-props<span style=color:#89dceb;font-weight:700>=</span>aiven.tokenAuth<span style=color:#89dceb;font-weight:700>=</span>&lt;AIVEN_AUTHENTICATION_TOKEN&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ jikkou config use-context aiven-demo
+</span></span></code></pre></div><p><em>Note: If necessary, refer to <a href=https://docs.aiven.io/docs/platform/howto/create_authentication_token target=_blank rel="noopener noreferrer">Aiven documentation</a>
+for more detail about how to create an authentication token.</em></p><h3 id=step-3-managing-acls-for-kafka-topics><a class=heading-anchor href=#step-3-managing-acls-for-kafka-topics>#</a>Step 3: Managing ACLs for Kafka Topics</h3><p>To check that everything works, let&rsquo;s first describe the existing ACL entries for our Kafka Topics using the <code>jikkou get avn-kafka-topic-acl</code> command:</p><p>If you have just created a new Kafka service, you should get a result similar to this one:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaTopicAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>labels</span>: {}
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>   <span style=color:#cba6f7>aiven.io/kafka-acl-id</span>: <span style=color:#a6e3a1>&#34;default&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;ADMIN&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;avnadmin&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;*&#34;</span>
+</span></span></code></pre></div><p>However, if you have an existing service with many ACLs, it may be preferable to use a <a href=https://streamthoughts.github.io/jikkou/docs/concepts/selectors/ target=_blank rel="noopener noreferrer"><em>selector</em></a>
+to list only the ACL entries for a specific <em>username</em>, as follows:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>jikkou get avn-kafka-topic-acl --selector <span style=color:#a6e3a1>&#39;spec.username IN (avnadmin)&#39;</span>
+</span></span></code></pre></div><p>Next, let&rsquo;s create a new ACL entry by creating a file <code>aiven-topic-acls.yaml</code> with the following content:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># ./aiven-topic-acls.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaTopicAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;READWRITE&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;alice&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;private-alice*&#34;</span>
+</span></span></code></pre></div><p>And, run <code>jikkou apply -f aiven-topic-acls.yaml</code>. Jikkou should output the executed changes:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-text data-lang=text><span style=display:flex><span>TASK [ADD] Add Kafka ACL Entry for user &#39;alice&#39; (topic=private-alice*, permission=readwrite) - CHANGED
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  &#34;status&#34; : &#34;CHANGED&#34;,
+</span></span><span style=display:flex><span>  &#34;changed&#34; : true,
+</span></span><span style=display:flex><span>  &#34;failed&#34; : false,
+</span></span><span style=display:flex><span>  &#34;end&#34; : 1690960004503,
+</span></span><span style=display:flex><span>  &#34;data&#34; : {
+</span></span><span style=display:flex><span>    &#34;after&#34; : {
+</span></span><span style=display:flex><span>      &#34;permission&#34; : &#34;readwrite&#34;,
+</span></span><span style=display:flex><span>      &#34;topic&#34; : &#34;private-alice*&#34;,
+</span></span><span style=display:flex><span>      &#34;username&#34; : &#34;alice&#34;
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    &#34;operation&#34; : &#34;ADD&#34;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>EXECUTION in 960ms
+</span></span><span style=display:flex><span>ok : 0, created : 1, altered : 0, deleted : 0 failed : 0
+</span></span></code></pre></div><p>If we go to the <a href=https://console.aiven.io/ target=_blank rel="noopener noreferrer">Aiven Web Console</a>
+, then we should see the new ACL entry.</p><p><img src=/images/posts/jikkou-aiven-acls/aiven-console-acl-topic.png alt="Aiven Web Console — ACL For Topic" loading=lazy></p><p><em>Aiven Web Console — ACL For Topic</em></p><p>Note that when creating an ACL entry you can grant <code>READ</code>, <code>WRITE</code>, <code>READWRITE</code>, or <code>ADMIN</code> permissions to a user.</p><p><em>For more detail about ACL, you can refer to the Aiven documentation at: <a href=https://docs.aiven.io/docs/products/kafka/concepts/acl target=_blank rel="noopener noreferrer">https://docs.aiven.io/docs/products/kafka/concepts/acl</a></em></p><h3 id=step-4-deleting-acls-for-kafka-topics><a class=heading-anchor href=#step-4-deleting-acls-for-kafka-topics>#</a>Step 4: Deleting ACLs for Kafka Topics</h3><p>Finally, and as with any other resources, we can remove the ACL entry, previously created, by using the specific annotation <code>jikkou.io/delete</code>:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># ./aiven-topic-acls.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaTopicAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>jikkou.io/delete</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;READWRITE&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;alice&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;private-alice*&#34;</span>
+</span></span></code></pre></div><p>Here, to only execute the <code>DELETE</code> change we will use the command <code>jikkou delete --files aiven-topic-acls.yaml</code> (but, we could also use <code>apply</code>).</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-text data-lang=text><span style=display:flex><span>TASK [DELETE] Delete Kafka ACL Entry for user &#39;alice&#39; (topic=private-alice*, permission=readwrite) - CHANGED
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  &#34;status&#34; : &#34;CHANGED&#34;,
+</span></span><span style=display:flex><span>  &#34;changed&#34; : true,
+</span></span><span style=display:flex><span>  &#34;failed&#34; : false,
+</span></span><span style=display:flex><span>  &#34;end&#34; : 1690960139775,
+</span></span><span style=display:flex><span>  &#34;data&#34; : {
+</span></span><span style=display:flex><span>    &#34;before&#34; : {
+</span></span><span style=display:flex><span>      &#34;permission&#34; : &#34;readwrite&#34;,
+</span></span><span style=display:flex><span>      &#34;topic&#34; : &#34;private-alice*&#34;,
+</span></span><span style=display:flex><span>      &#34;username&#34; : &#34;alice&#34;,
+</span></span><span style=display:flex><span>      &#34;id&#34; : &#34;acl44e40d03141&#34;
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    &#34;operation&#34; : &#34;DELETE&#34;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>EXECUTION in 917ms
+</span></span><span style=display:flex><span>ok : 0, created : 0, altered : 0, deleted : 1 failed : 0
+</span></span></code></pre></div><p>Using the <code>jikkou.io/delete</code> annotation is the safest way to remove specific ACL entries. However, using it can quickly become tedious if you manage all access to your kafka topics in a single repository.</p><p>Let&rsquo;s imagine we want to create a set of ACLs for all our Kafka users. For doing this, we can easily use Jikkou templating capabilities:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># ./aiven-users.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>users</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>username</span>: alice
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>acls</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;WRITE&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;private-alice*&#34;</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>username</span>: bob
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>acls</span>: []
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic>#./aiven-topic-acls.tpl</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaTopicAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;ADMIN&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;avnadmin&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>{% for user in values.users %}
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaTopicAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;READ&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;{{ user.username }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;public-*&#34;</span>
+</span></span><span style=display:flex><span>{% for acl in user.acls %}
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaTopicAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;{{ acl.permission }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;{{ user.username }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;{{ acl.topic }}&#34;</span>
+</span></span><span style=display:flex><span>{% endfor %}
+</span></span><span style=display:flex><span>{% endfor %}
+</span></span></code></pre></div><p>ACL entries can then be managed using the Jikkou CLI command:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou apply <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --files aiven-topic-acls.tpl <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --values-files aiven-users.yaml <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --options delete-orphans<span style=color:#89dceb;font-weight:700>=</span><span style=color:#89dceb>true</span>
+</span></span></code></pre></div><p>After running this, we should see all the ACL entries created by Jikkou in the <a href=https://console.aiven.io/ target=_blank rel="noopener noreferrer">Aiven Web Console</a>
+.</p><p><img src=/images/posts/jikkou-aiven-acls/aiven-console-acl-users.png alt="Aiven Web Console — ACL For Topic" loading=lazy></p><p><em>Aiven Web Console — ACL For Topic</em></p><p>As you can see, in the above command, we have specified the <code>delete-orphans=true</code> option. This option can be used to indicate that we want to delete all ACL entries that are not explicitly defined in the input files. Usually, this option is used only if all ACLs are managed by Jikkou. Otherwise, you could unintentionally delete ACLs created directly from the <a href=https://console.aiven.io/ target=_blank rel="noopener noreferrer">Aiven Web Console</a>
+or the <a href=https://registry.terraform.io/providers/aiven/aiven/latest/docs target=_blank rel="noopener noreferrer">Aiven Terraform Provider</a>
+.</p><p>Next, we could for example remove the user <code>bob</code> from the <code>aiven-users.yaml</code> and re-execute the <code>apply</code> command to remove any ACL entries attached to this user.</p><p>Edit the <code>./aiven-users.yaml</code> as follows:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>users</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>username</span>: alice
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>acls</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;WRITE&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>topic</span>: <span style=color:#a6e3a1>&#34;private-alice*&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic>#  - username: bob</span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic>#    acls: []</span>
+</span></span></code></pre></div><p>Then, re-execute the command with the additional <code>--dry-run</code> option to make sure that only desired ACL entries will be deleted.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou apply <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --files aiven-topic-acls.tpl <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --values-files aiven-users.yaml <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --options delete-orphans<span style=color:#89dceb;font-weight:700>=</span><span style=color:#89dceb>true</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --dry-run
+</span></span></code></pre></div><p>Finally, Jikkou should output the <em>DELETE</em> change for user <em>bob</em>.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-text data-lang=text><span style=display:flex><span>TASK [DELETE] Delete Kafka ACL Entry for user &#39;bob&#39; (topic=public-*, permission=read) - CHANGED
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  &#34;status&#34; : &#34;CHANGED&#34;,
+</span></span><span style=display:flex><span>  &#34;changed&#34; : true,
+</span></span><span style=display:flex><span>  &#34;failed&#34; : false,
+</span></span><span style=display:flex><span>  &#34;end&#34; : 1690960320860,
+</span></span><span style=display:flex><span>  &#34;data&#34; : {
+</span></span><span style=display:flex><span>    &#34;before&#34; : {
+</span></span><span style=display:flex><span>      &#34;permission&#34; : &#34;read&#34;,
+</span></span><span style=display:flex><span>      &#34;topic&#34; : &#34;public-*&#34;,
+</span></span><span style=display:flex><span>      &#34;username&#34; : &#34;bob&#34;,
+</span></span><span style=display:flex><span>      &#34;id&#34; : &#34;acl44e40fdf8c4&#34;
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    &#34;operation&#34; : &#34;DELETE&#34;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># ... omitted for clarity
+</span></span></code></pre></div><h2 id=acls-for-schema-registry-aiven><a class=heading-anchor href=#acls-for-schema-registry-aiven>#</a>ACLs For Schema Registry (Aiven)</h2><p>Managing ACLs for Schema Registry is just as simple.</p><p>You can use the <code>jikkou get avn-schema-registry-acl</code> command to list all the ACL entries.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;SchemaRegistryAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>: {}
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>kafka.aiven.io/acl-entry-id</span>: <span style=color:#a6e3a1>&#34;default-sr-admin-config&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;WRITE&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;avnadmin&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>resource</span>: <span style=color:#a6e3a1>&#34;Config:&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.aiven.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;SchemaRegistryAclEntry&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>: {}
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>kafka.aiven.io/acl-entry-id</span>: <span style=color:#a6e3a1>&#34;default-sr-admin-subject&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>permission</span>: <span style=color:#a6e3a1>&#34;WRITE&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>username</span>: <span style=color:#a6e3a1>&#34;avnadmin&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>resource</span>: <span style=color:#a6e3a1>&#34;Subject:*&#34;</span>
+</span></span></code></pre></div><p>As you can see, in the example above, the resource name pattern should be <code>Config:</code> or <code>Subject:&lt;schema_name_or_pattern></code> depending on whether you want to grant authorization for a <em>Subject</em> or a <em>Config</em>.</p><p>In addition, only <code>READ</code> and <code>WRITE</code> permissions can be granted to users.</p><p>Creating and deleting ACL entries for the Schema Registry is similar to what we have already seen in the previous section for Kafka topics.</p><h2 id=conclusion><a class=heading-anchor href=#conclusion>#</a>Conclusion</h2><p>Jikkou continues to evolve with the aim of making the configuration of a streaming platform so easy that it becomes boring. As we&rsquo;ve just seen, Jikkou now integrates more easily with Aiven to help more Apache Kafka users. It offers a simple way to manage your ACLs, and can easily be used to set up a GitOps approach in order to automate the management of your kafka infrastructure.</p><p>If you find this project valuable, I kindly ask you to show your support by sharing this article and spreading the word. You can even show your support by giving a star on the <a href=https://github.com/streamthoughts/jikkou target=_blank rel="noopener noreferrer">GitHub</a>
+repository.</p><p>We also welcome contributions from the community. If you have any ideas or specific project needs, please feel free to reach out and propose them. You can actively contribute to the project by creating <a href=https://github.com/streamthoughts/jikkou/pulls target=_blank rel="noopener noreferrer">pull requests</a>
+(PR).</p><p>Thank you very much.</p></div><nav class=post-nav><a class=prev href=https://www.fhussonnois.dev/posts/why-is-managing-kafka-topics-still-such-a-pain-introducing-jikkou/>Why is Managing Kafka Topics Still Such a Pain? Introducing Jikkou!</a>
+<a class=next href=https://www.fhussonnois.dev/posts/gitops-kafka-schema-management-jikkou-github-actions/>GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions</a></nav></article></main><footer class=site-footer><div class=container><div class=footer-socials><a href=https://github.com/fhussonnois target=_blank rel=noopener aria-label=GitHub><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg>
+</a><a href=https://twitter.com/fhussonnois target=_blank rel=noopener aria-label=Twitter><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1.0 3-1.2 3-1.2z"/></svg>
+</a><a href=https://www.linkedin.com/in/florian-hussonnois/ target=_blank rel=noopener aria-label=LinkedIn><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+</a><a href=https://stackoverflow.com/users/3660859/fhussonnois target=_blank rel=noopener aria-label="Stack Overflow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 20V12"/><path d="M20 20V12"/><path d="M7 17h10"/><path d="M7.5 13.5l9.2 1.8"/><path d="M8.8 10.1l8.5 3.9"/><path d="M11 7l7.1 5.8"/></svg></a></div><p class=footer-prompt><span class=prompt>>_</span> &copy; 2026 Florian Hussonnois</p></div></footer><script src=/js/theme-toggle.min.8c15e1b03ddad9066a2d55e38fe897951bafbc6b24db02de0ea1d219296def11.js></script></body></html>

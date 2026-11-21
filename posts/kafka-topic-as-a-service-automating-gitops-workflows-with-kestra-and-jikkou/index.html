@@ -1,0 +1,722 @@
+<!doctype html><html lang=en-us data-theme=light><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Kafka Topic as a Service: Automating GitOps Workflows with Kestra and Jikkou | Florian Hussonnois</title><meta name=description content="From manual CLI commands to a fully automated, human-in-the-loop provisioning service with Kestra and Jikkou on Aiven’s free Kafka tier."><meta name=author content="Florian Hussonnois"><link rel=canonical href=https://www.fhussonnois.dev/posts/kafka-topic-as-a-service-automating-gitops-workflows-with-kestra-and-jikkou/><meta property="og:type" content="article"><meta property="og:title" content="Kafka Topic as a Service: Automating GitOps Workflows with Kestra and Jikkou | Florian Hussonnois"><meta property="og:description" content="From manual CLI commands to a fully automated, human-in-the-loop provisioning service with Kestra and Jikkou on Aiven’s free Kafka tier."><meta property="og:url" content="https://www.fhussonnois.dev/posts/kafka-topic-as-a-service-automating-gitops-workflows-with-kestra-and-jikkou/"><meta property="og:site_name" content="Florian Hussonnois — Apache Kafka, Kestra & Data Streaming"><meta property="og:image" content="https://www.fhussonnois.dev/images/posts/kafka-topic-as-a-service/cover.jpg"><meta property="article:published_time" content="2026-09-21T00:00:00Z"><meta property="article:author" content="Florian Hussonnois"><meta property="article:tag" content="apache kafka"><meta property="article:tag" content="kestra"><meta property="article:tag" content="jikkou"><meta property="article:tag" content="gitops"><meta property="article:tag" content="aiven"><meta property="article:tag" content="orchestration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:site content="@fhussonnois"><meta name=twitter:creator content="@fhussonnois"><meta name=twitter:title content="Kafka Topic as a Service: Automating GitOps Workflows with Kestra and Jikkou"><meta name=twitter:description content="From manual CLI commands to a fully automated, human-in-the-loop provisioning service with Kestra and Jikkou on Aiven’s free Kafka tier."><meta name=twitter:image content="https://www.fhussonnois.dev/images/posts/kafka-topic-as-a-service/cover.jpg"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kafka Topic as a Service: Automating GitOps Workflows with Kestra and Jikkou","description":"From manual CLI commands to a fully automated, human-in-the-loop provisioning service with Kestra and Jikkou on Aiven’s free Kafka tier.","url":"https:\/\/www.fhussonnois.dev\/posts\/kafka-topic-as-a-service-automating-gitops-workflows-with-kestra-and-jikkou\/","datePublished":"2026-09-21T00:00:00Z","dateModified":"2026-09-21T00:00:00Z","image":"https:\/\/www.fhussonnois.dev\/images\/posts\/kafka-topic-as-a-service\/cover.jpg","author":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev/about/"},"publisher":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev"},"keywords":["apache kafka","kestra","jikkou","gitops","aiven","orchestration"]}</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel=stylesheet><script>(function(){var e=localStorage.getItem("theme");e==="dark"&&document.documentElement.setAttribute("data-theme","dark")})()</script><link rel=stylesheet href=/css/main.min.609ff1b5cd149b19c6eebb465010d9ef1dd831c368abb5c128051ea9d3d023f9.css><link rel=icon type=image/png href=/images/avatar.png></head><body><a class=skip-to-content href=#main-content>Skip to content</a><nav class=site-nav role=navigation aria-label="Main navigation"><div class=nav-inner><a class=nav-logo href=/><span class=prompt>>_</span> fhussonnois.dev</a><ul class=nav-links id=nav-links><li><a href=/posts/ aria-current=section>Blog</a></li><li><a href=/projects/>Projects</a></li><li><a href=/contributions/>Contributions</a></li><li><a href=/conferences/>Conferences</a></li><li><a href=/about/>About</a></li><li><a href=/tags/>Tags</a></li></ul><div class=nav-right><button class=theme-toggle aria-label="Toggle dark mode">
+<span class=icon-sun><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</span><span class=icon-moon><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</span></button>
+<button class=nav-toggle aria-label="Toggle menu" aria-expanded=false>
+<svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></nav><main id=main-content><article class=container><header class=post-header><h1 class=post-title>Kafka Topic as a Service: Automating GitOps Workflows with Kestra and Jikkou</h1><div class=post-meta><time datetime=2026-09-21>September 21, 2026</time>
+<span>3894 words</span>
+<span>19 min read</span></div><div class=post-tags><a class=tag-pill href=/tags/apache-kafka/>apache kafka</a>
+<a class=tag-pill href=/tags/kestra/>kestra</a>
+<a class=tag-pill href=/tags/jikkou/>jikkou</a>
+<a class=tag-pill href=/tags/gitops/>gitops</a>
+<a class=tag-pill href=/tags/aiven/>aiven</a>
+<a class=tag-pill href=/tags/orchestration/>orchestration</a></div></header><div class=prose><p><img src=/images/posts/kafka-topic-as-a-service/cover.jpg alt="Photo by Barrington Ratliff on Unsplash" loading=lazy></p><p><em>Photo by Barrington Ratliff on <a href=https://unsplash.com target=_blank rel="noopener noreferrer">Unsplash</a></em></p><p><em>This blog post was originally published on <a href=https://medium.com/@fhussonnois/kafka-topic-as-a-service-automating-gitops-workflows-with-kestra-and-jikkou-f9eff8633a86 target=_blank rel="noopener noreferrer">Medium</a></em></p><p><em>From manual CLI commands to a fully automated, human-in-the-loop provisioning service with Kestra and Jikkou on Aiven’s free Kafka tier.</em></p><p>Managing Apache Kafka resources at scale is one of those problems that starts simple and quickly becomes painful. One day you’re running <code>kafka-topic.sh</code> from your terminal, and the next you’re the gatekeeper for dozens of teams who all need topics, ACLs, and connectors, and of course they needed them yesterday.</p><p>Over the years of working with Kafka, I’ve seen this pattern repeat itself: a centralized Ops team becomes a bottleneck, Jira tickets or Github issues pile up, and developers grow frustrated waiting for resources that should take seconds to provision.</p><p>And the worst part of it all is that we all know the root cause: <strong>no automation</strong>, <strong>no standardization</strong>.</p><p>And let’s be honest, even if you’ve implemented <a href=https://developer.hashicorp.com/terraform target=_blank rel="noopener noreferrer">Terraform</a>
+, it’s likely that a single team is managing the <code>apply</code>, struggling every day to manage stale plans. And here you are missing the final problem: you miss <strong>the self-service</strong>.</p><p>In this post, I’m going to show you one way to solve that, but the same approach could be used for ACLs, Schema management, or probably for anything else.</p><p>For this, I’m going to combine two tools I work on: <a href=https://www.jikkou.io/ target=_blank rel="noopener noreferrer"><strong>Jikkou</strong></a>
+(an open-source Resource-as-Code framework for Apache Kafka) and <a href=https://kestra.io/ target=_blank rel="noopener noreferrer"><strong>Kestra</strong></a>
+(the orchestration and automation platform I work on as Lead Software Engineer). Together, they form the foundation for our Kafka Topic as a Service, complete with GitOps, diff previews, human approval, and a polished self-service UI.</p><p>We’ll build everything on Aiven’s free Kafka tier, so you can follow along without standing up your own cluster.</p><h2 id=why-clis-and-scripts-arent-enough><a class=heading-anchor href=#why-clis-and-scripts-arent-enough>#</a>Why CLIs and Scripts Aren’t Enough</h2><p>I’m sure you already have the answer, but let’s be concrete about what breaks down. It starts with one topic:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>kafka-topics.sh --bootstrap-server localhost:9092 <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --create --topic my-orders-topic <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --partitions <span style=color:#fab387>6</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --replication-factor <span style=color:#fab387>3</span>
+</span></span></code></pre></div><p>But six months later someone asks: “<em>How many partitions does my-orders-topic have, and who set it up?</em>” Nobody knows. You have <strong>no history, and no audit logs.</strong> Just a Slack message from this summer that you’ve probably already lost, since you haven’t signed up for any Slack subscriptions 😉</p><p>Then come the config changes, and the real danger:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>kafka-configs.sh --bootstrap-server localhost:9092 <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --entity-type topics --entity-name my-orders-topic <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  --alter --add-config retention.ms<span style=color:#89dceb;font-weight:700>=</span><span style=color:#fab387>17280000</span>
+</span></span></code></pre></div><p>Oops, one misplaced zero in <code>retention.ms</code>, and you’re explaining to your team why they lost two days of data (true story, I know teams to whom this has happened 🫠).</p><p>Add a second and a third environment, and you can’t reproducibly replay what you did in dev into prod. Every environment drifts and you’re flying blind.</p><p>This is precisely the problem <strong>GitOps</strong> was designed to solve.</p><h2 id=introducing-jikkou><a class=heading-anchor href=#introducing-jikkou>#</a>Introducing Jikkou</h2><p><img src=/images/posts/kafka-topic-as-a-service/jikkou-logo.png alt=Jikkou loading=lazy></p><p><a href=https://www.jikkou.io/ target=_blank rel="noopener noreferrer">Jikkou</a>
+(実行 — Japanese for “execution, carrying out a plan”) is a project I started to bring a proper Resource-as-Code approach to Apache Kafka. It’s open source, Apache 2.0-licensed, written in Java, and available as a native binary built with GraalVM.</p><p>The core idea is simple: instead of running imperative CLI commands, you declare the desired state of your Kafka resources in YAML using the same resource model as Kubernetes, so it feels immediately familiar:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># topics/my-orders-topic.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.jikkou.io/v1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: KafkaTopic
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#39;my-orders-topic&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>environment</span>: production
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>managed-by</span>: jikkou
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>partitions</span>: <span style=color:#fab387>6</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>replicas</span>: <span style=color:#fab387>3</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>configs</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>min.insync.replicas</span>: <span style=color:#fab387>2</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>retention.ms</span>: <span style=color:#fab387>172800000</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>cleanup.policy</span>: <span style=color:#a6e3a1>&#39;delete&#39;</span>
+</span></span></code></pre></div><p>Jikkou then connects to your Kafka cluster, reads its actual state, computes a diff, and applies only what needs to change.</p><blockquote><p>No state file to manage. <strong>Kafka itself is the source of truth</strong>.</p></blockquote><p>A few things that make it truly useful beyond the basics:</p><p><strong>Diff before you apply.</strong> Run <code>jikkou diff</code> to see exactly what will change before touching anything in production. The output is structured and machine-readable (JSON or YAML), which makes it easy to feed into CI pipelines, approval workflows, or AI Agents.</p><p><strong>Resource policies for guardrails.</strong> You can define governance rules as standalone YAML resources using <a href=https://cel.dev/ target=_blank rel="noopener noreferrer">Google’s Common Expression Language</a>
+(CEL) to enforce naming conventions, partition bounds, replication requirements, and more. Policies are versioned in Git alongside your topic definitions.</p><p><strong>Templating.</strong> Jikkou supports <a href=https://jinja.palletsprojects.com/en/stable/ target=_blank rel="noopener noreferrer">Jinja-style</a>
+templating (via Jinjava) for generating multiple resources from a single template and a values file. This is really useful when you need the same topic structure across many environments or regions.</p><p><strong>Stateless and portable.</strong> No daemon, no operator, no Kubernetes required. Run it anywhere Java runs, use it in a GitHub Action, AI Agent Skill, or use the native binary directly.</p><p>Install via <a href=https://sdkman.io/ target=_blank rel="noopener noreferrer">SDKMAN</a>
+: <code>sdk install jikkou</code></p><h2 id=introducing-kestra><a class=heading-anchor href=#introducing-kestra>#</a>Introducing Kestra</h2><p><img src=/images/posts/kafka-topic-as-a-service/kestra-logo.png alt=Kestra loading=lazy></p><p><strong>Kestra</strong> is an open-source, declarative workflow orchestration platform. Everything is defined in YAML. Kestra handles scheduling, retries, error handling, secrets management, and has a rich plugin ecosystem: GitHub, HTTP, Slack, databases, cloud providers, and more: <a href=https://kestra.io/plugins target=_blank rel="noopener noreferrer">https://kestra.io/plugins</a></p><p>For our use case, Kestra is the orchestration layer that ties everything together: it accepts user inputs, generates the Jikkou YAML, runs the diff, sends a notification for review, pauses for human approval, applies the change, and merges the PR. And of course, everything is done in a single auditable and versioned execution.</p><p>The feature we’ll lean on most is <strong>Pause/Resume</strong>: a workflow can halt mid-execution and wait for minutes, hours, or days until a human explicitly resumes it. The entire execution state is preserved. This is the backbone of a proper human-in-the-loop approval gate, with no custom webhook plumbing needed.</p><h2 id=what-were-building><a class=heading-anchor href=#what-were-building>#</a>What We’re Building</h2><p>Here’s our full “Self-Service Kafka Topic Provisioning” workflow, end to end:</p><p><img src=/images/posts/kafka-topic-as-a-service/workflow.png alt="Self-Service Kafka Topic Provisioning workflow" loading=lazy></p><h2 id=setup-prerequisites><a class=heading-anchor href=#setup-prerequisites>#</a>Setup: Prerequisites</h2><p>To follow along you’ll need:</p><ul><li>A <a href=https://aiven.io/free-kafka target=_blank rel="noopener noreferrer"><strong>Free Aiven</strong></a>
+account at <a href=https://aiven.io/ target=_blank rel="noopener noreferrer">aiven.io</a>
+with a running Kafka service.</li><li>A <strong>Kestra instance (v2.0.x)</strong> — <a href=https://kestra.io/docs/installation/docker-compose target=_blank rel="noopener noreferrer">Docker Compose</a>
+is the fastest path (see instructions below)</li><li>A GitHub repository to store your Jikkou resource files</li><li>A Slack webhook URL to send notifications.</li></ul><p>No Jikkou installation is required here. Kestra will run Jikkou as a Docker container via its Docker task runner. The <code>streamthoughts/jikkou:latest</code> image will be pulled automatically the first time a flow executes.</p><blockquote><p>Note: Files and resources used in this blog post are available on this GitHub Repository: <a href=https://github.com/fhussonnois/orchestrating-streams/tree/main/jikkou target=_blank rel="noopener noreferrer">https://github.com/fhussonnois/orchestrating-streams/tree/main/jikkou</a></p></blockquote><h2 id=step-1-configure-jikkou-for-aiven-kafka><a class=heading-anchor href=#step-1-configure-jikkou-for-aiven-kafka>#</a>Step 1: Configure Jikkou for Aiven Kafka</h2><h3 id=connect-to-aiven-kafka><a class=heading-anchor href=#connect-to-aiven-kafka>#</a>Connect to Aiven Kafka</h3><p>First, from your Aiven Kafka service <strong>Overview</strong> page, download the SSL credentials (CA cert, client cert, client key) and note your bootstrap server address (<em>host</em>). Aiven uses mutual TLS so you’ll need all of these to configure Jikkou.</p><ol><li>Log in to <a href=https://console.aiven.io/ target=_blank rel="noopener noreferrer">Aiven Console</a>
+and select your Apache Kafka service.</li><li>Download the <strong>Access Key</strong>, <strong>Access Certificate</strong>, and <strong>CA Certificate</strong>. The files <em>service.key</em>, <em>service.cert</em>, and <em>ca.pem</em> are necessary.</li><li>Create the <strong>keystore</strong> and <strong>truststore</strong>: (see: <a href=https://aiven.io/docs/products/kafka/howto/keystore-truststore#access-service-certificates target=_blank rel="noopener noreferrer">Configure Java SSL keystore and truststore to access Apache Kafka®</a>
+)</li><li>Copy <code>client.keystore.p12</code> and <code>client.truststore.jks</code> file in a <code>certs</code> folder alongside your project, and set the permissions: <code>chmod 644 certs/client.keystore.p12 certs/client.truststore.jks</code></li></ol><h3 id=configure-jikkou><a class=heading-anchor href=#configure-jikkou>#</a>Configure Jikkou</h3><p>Create the Jikkou configuration file <code>jikkou.json</code>:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;currentContext&#34;</span> : <span style=color:#a6e3a1>&#34;aiven&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;aiven&#34;</span> : {
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;configFile&#34;</span> : <span style=color:#a6e3a1>&#34;/app/application.conf&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Then, create an <code>application.conf</code> that reads connection details from environment variables. We will inject these later as Kestra secrets:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-fallback data-lang=fallback><span style=display:flex><span>jikkou {
+</span></span><span style=display:flex><span>  provider.kafka {
+</span></span><span style=display:flex><span>    default = true
+</span></span><span style=display:flex><span>    type = io.jikkou.kafka.KafkaExtensionProvider
+</span></span><span style=display:flex><span>    config = {
+</span></span><span style=display:flex><span>      client {
+</span></span><span style=display:flex><span>        bootstrap.servers        = ${?KAFKA_BOOTSTRAP_SERVERS}
+</span></span><span style=display:flex><span>        security.protocol        = &#34;SSL&#34;
+</span></span><span style=display:flex><span>        ssl.truststore.location  = ${?KAFKA_TRUSTSTORE_PATH}
+</span></span><span style=display:flex><span>        ssl.truststore.password  = ${?KAFKA_TRUSTSTORE_PASSWORD}
+</span></span><span style=display:flex><span>        ssl.keystore.location    = ${?KAFKA_KEYSTORE_PATH}
+</span></span><span style=display:flex><span>        ssl.keystore.password    = ${?KAFKA_KEYSTORE_PASSWORD}
+</span></span><span style=display:flex><span>        ssl.key.password         = ${?KAFKA_KEY_PASSWORD}
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=test-connection><a class=heading-anchor href=#test-connection>#</a>Test Connection</h3><p>Now, you can verify the connection using the Jikkou Docker image directly. Make sure to replace the below env variables values with yours.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>docker run --rm <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -v <span style=color:#a6e3a1>&#34;</span><span style=color:#cba6f7>$(</span><span style=color:#89dceb>pwd</span><span style=color:#cba6f7>)</span><span style=color:#a6e3a1>/jikkou.json:/etc/jikkou/config&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -v <span style=color:#a6e3a1>&#34;</span><span style=color:#cba6f7>$(</span><span style=color:#89dceb>pwd</span><span style=color:#cba6f7>)</span><span style=color:#a6e3a1>/application.conf:/app/application.conf&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -v <span style=color:#a6e3a1>&#34;</span><span style=color:#cba6f7>$(</span><span style=color:#89dceb>pwd</span><span style=color:#cba6f7>)</span><span style=color:#a6e3a1>/certs:/certs&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -e <span style=color:#f5e0dc>KAFKA_BOOTSTRAP_SERVERS</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#34;&lt;your-aiven-host:12345&gt;&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -e <span style=color:#f5e0dc>KAFKA_TRUSTSTORE_PATH</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#34;/certs/client.truststore.jks&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -e <span style=color:#f5e0dc>KAFKA_TRUSTSTORE_PASSWORD</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#34;changeit&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -e <span style=color:#f5e0dc>KAFKA_KEYSTORE_PATH</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#34;/certs/client.keystore.p12&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -e <span style=color:#f5e0dc>KAFKA_KEYSTORE_PASSWORD</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#34;changeit&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  -e <span style=color:#f5e0dc>KAFKA_KEY_PASSWORD</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#34;changeit&#34;</span> <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  streamthoughts/jikkou:latest <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>  health get kafka
+</span></span></code></pre></div><p>You should get an output similar to:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;core.jikkou.io/v1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;ApiHealthResult&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;kafka&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>status</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;UP&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>details</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>resource</span>: <span style=color:#a6e3a1>&#34;urn:kafka:cluster:id:&lt;cluster_id&gt;&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>brokers</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: <span style=color:#a6e3a1>&#34;1&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>host</span>: <span style=color:#a6e3a1>&#34;&lt;ip_broker_1&gt;&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>port</span>: <span style=color:#fab387>12345</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: <span style=color:#a6e3a1>&#34;2&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>host</span>: <span style=color:#a6e3a1>&#34;&lt;ip_broker_2&gt;&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>port</span>: <span style=color:#fab387>12345</span>
+</span></span></code></pre></div><h3 id=start-kestra><a class=heading-anchor href=#start-kestra>#</a>Start Kestra</h3><p>First, create a <code>.env</code> file with your secrets. Kestra expects secret keys prefixed with <code>SECRET_</code> and values base64-encoded (see <a href=https://kestra.io/docs/how-to-guides/secrets#using-secrets-in-kestra target=_blank rel="noopener noreferrer">official doc</a>
+):</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#6c7086;font-style:italic># .env (plain text - do not commit this file)</span>
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>GITHUB_TOKEN</span><span style=color:#89dceb;font-weight:700>=</span>ghp_your_github_token
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>GITHUB_REPO</span><span style=color:#89dceb;font-weight:700>=</span>your_org/your_repository
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>SLACK_WEBHOOK_URL</span><span style=color:#89dceb;font-weight:700>=</span>https://hooks.slack.com/services/xxx/yyy/zzz
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>KAFKA_BOOTSTRAP_SERVERS</span><span style=color:#89dceb;font-weight:700>=</span>your-aiven-host:12345
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>KAFKA_TRUSTSTORE_PATH</span><span style=color:#89dceb;font-weight:700>=</span>/certs/client.truststore.jks
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>KAFKA_TRUSTSTORE_PASSWORD</span><span style=color:#89dceb;font-weight:700>=</span>changeit
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>KAFKA_KEYSTORE_PATH</span><span style=color:#89dceb;font-weight:700>=</span>/certs/client.keystore.p12
+</span></span><span style=display:flex><span><span style=color:#f5e0dc>KAFKA_KEY_PASSWORD</span><span style=color:#89dceb;font-weight:700>=</span>changeit
+</span></span></code></pre></div><p>Then, use the following script to encode it into the format Kestra expects:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#cba6f7>while</span> <span style=color:#f5e0dc>IFS</span><span style=color:#89dceb;font-weight:700>=</span><span style=color:#a6e3a1>&#39;=&#39;</span> <span style=color:#89dceb>read</span> -r key value; <span style=color:#cba6f7>do</span>
+</span></span><span style=display:flex><span>  <span style=color:#89dceb>echo</span> <span style=color:#a6e3a1>&#34;SECRET_</span><span style=color:#f5e0dc>$key</span><span style=color:#a6e3a1>=</span><span style=color:#cba6f7>$(</span><span style=color:#89dceb>echo</span> -n <span style=color:#a6e3a1>&#34;</span><span style=color:#f5e0dc>$value</span><span style=color:#a6e3a1>&#34;</span> | base64 -w 0<span style=color:#cba6f7>)</span><span style=color:#a6e3a1>&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>done</span> &lt; .env &gt; .env_encoded
+</span></span></code></pre></div><p>Now save the following <code>docker-compose.yml</code> and run <code>docker compose -f docker-compose.yml up -d</code></p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#cba6f7>volumes</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>postgres-data</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>driver</span>: local
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>kestra-data</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>driver</span>: local
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>services</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>postgres</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>image</span>: postgres
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>volumes</span>:
+</span></span><span style=display:flex><span>      - postgres-data:/var/lib/postgresql/data
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>environment</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>POSTGRES_DB</span>: kestra
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>POSTGRES_USER</span>: kestra
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>POSTGRES_PASSWORD</span>: k3str4
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>healthcheck</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>test</span>: [<span style=color:#a6e3a1>&#34;CMD-SHELL&#34;</span>, <span style=color:#a6e3a1>&#34;pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}&#34;</span>]
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>interval</span>: 30s
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>timeout</span>: 10s
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>retries</span>: <span style=color:#fab387>10</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>kestra</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>image</span>: kestra/kestra:latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>pull_policy</span>: if_not_present
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>user</span>: <span style=color:#a6e3a1>&#34;root&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>command</span>: server standalone
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>volumes</span>:
+</span></span><span style=display:flex><span>      - kestra-data:/app/storage
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># The Docker socket mount is what allows Kestra to spin up</span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># task runner containers - for Jikkou, for alpine/git, for gh CLI</span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># without installing any of those tools on the host.</span>
+</span></span><span style=display:flex><span>      - /var/run/docker.sock:/var/run/docker.sock
+</span></span><span style=display:flex><span>      - /tmp/kestra-wd:/tmp/kestra-wd
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>env_file</span>:
+</span></span><span style=display:flex><span>      - .env_encoded
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>environment</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KESTRA_CONFIGURATION</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        datasources:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          postgres:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            url: jdbc:postgresql://postgres:5432/kestra
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            driverClassName: org.postgresql.Driver
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            username: kestra
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            password: k3str4
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        kestra:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          repository:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            type: postgres
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          storage:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            type: local
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            local:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              basePath: &#34;/app/storage&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          queue:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            type: postgres
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          tasks:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            tmpDir:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              path: /tmp/kestra-wd/tmp
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          url: http://localhost:8080/
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          tutorial-flows:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            enabled: false</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>ports</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#a6e3a1>&#34;8080:8080&#34;</span>
+</span></span><span style=display:flex><span>      - <span style=color:#a6e3a1>&#34;8081:8081&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>depends_on</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>postgres</span>:
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>condition</span>: service_healthy
+</span></span></code></pre></div><p>Open <a href=http://localhost:8080/ target=_blank rel="noopener noreferrer">http://localhost:8080</a>
+to verify Kestra is running.</p><h2 id=step-2-define-guardrails-with-jikkou-resource-policies><a class=heading-anchor href=#step-2-define-guardrails-with-jikkou-resource-policies>#</a>Step 2: Define Guardrails with Jikkou Resource Policies</h2><p>Connecting Jikkou to your cluster is only half the story. You also need guardrails, i.e., rules that prevent bad configurations from reaching Kafka in the first place.</p><p>Jikkou handles this with <a href=https://www.jikkou.io/docs/how-to-guides/enforce-policies/ target=_blank rel="noopener noreferrer"><strong>ValidatingResourcePolicy</strong></a>
+: standalone YAML resources, versioned in Git alongside your topic definitions, reusable across teams, and written using <a href=https://cel.dev/ target=_blank rel="noopener noreferrer">Google’s Common Expression Language</a>
+(CEL). If you’ve used Kubernetes ValidatingAdmissionPolicies, this will feel immediately familiar.</p><p>Here’s the policy file we’ll use for this project:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># policies/kafka-topic-policy.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: core.jikkou.io/v1
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: ValidatingResourcePolicy
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: kafka-topic-guardrails
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>failurePolicy</span>: FAIL
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>matchResources</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>kind</span>: KafkaTopic
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: TopicNameMustBeLowercase
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>expression</span>: <span style=color:#a6e3a1>&#34;resource.metadata.name.matches(&#39;^[a-z0-9]+(-[a-z0-9]+)*$&#39;)&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>messageExpression</span>: <span style=color:#a6e3a1>&#34;&#39;Topic name must be kebab-case (lowercase alphanumerics and dashes), but was: &#39; + resource.metadata.name&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: PartitionsMustBeAtMostTwo
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>expression</span>: <span style=color:#a6e3a1>&#34;resource.spec.partitions &lt;= 2&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>messageExpression</span>: <span style=color:#a6e3a1>&#34;&#39;Partition count must be &lt;= 2, got: &#39; + string(resource.spec.partitions)&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: ReplicationFactorMustBeSet
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>expression</span>: <span style=color:#a6e3a1>&#34;has(resource.spec.replicas)&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>message</span>: <span style=color:#a6e3a1>&#34;Topic must explicitly declare spec.replicas&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: ReplicationFactorMustBeAtMostTwo
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>expression</span>: <span style=color:#a6e3a1>&#34;!has(resource.spec.replicas) || resource.spec.replicas &lt;= 2&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>messageExpression</span>: <span style=color:#a6e3a1>&#34;&#39;Topic replication factor must be &lt;= 2, but was: &#39; + string(resource.spec.replicas)&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: RetentionWithinBounds
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>expression</span>: &gt;<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        !has(resource.spec.configs) ||
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        !(&#39;retention.ms&#39; in resource.spec.configs) ||
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        (int(resource.spec.configs[&#39;retention.ms&#39;]) &gt;= 3600000 &amp;&amp;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>         int(resource.spec.configs[&#39;retention.ms&#39;]) &lt;= 604800000)</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>message</span>: <span style=color:#a6e3a1>&#34;retention.ms must be between 1 hour and 7 days&#34;</span>
+</span></span></code></pre></div><p><em>Note: Aiven’s free Kafka tier limits topics to a maximum of 2 partitions with a replication factor of 2.</em></p><p>And, a second policy to prevent accidental topic deletions:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># policies/no-topic-deletion.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: core.jikkou.io/v1
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: ValidatingResourcePolicy
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: prevent-topic-deletion
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>failurePolicy</span>: FILTER
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>matchResources</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>kind</span>: KafkaTopicChange
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>name</span>: FilterDeleteOperation
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>expression</span>: <span style=color:#a6e3a1>&#34;resource.spec.op == &#39;DELETE&#39;&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>messageExpression</span>: <span style=color:#a6e3a1>&#34;&#39;DELETE operations on topics are not authorized&#39;&#34;</span>
+</span></span></code></pre></div><p>Notice the <code>failurePolicy: FILTER</code> so instead of failing the entire reconciliation, Jikkou silently drops the delete operation and logs a warning.</p><h2 id=load-policies-from-a-repository><a class=heading-anchor href=#load-policies-from-a-repository>#</a>Load policies from a repository</h2><p>To make Jikkou pick up these policies automatically, add a <code>repositories</code> block to your <code>application.conf</code>:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-fallback data-lang=fallback><span style=display:flex><span>jikkou {
+</span></span><span style=display:flex><span>  # ... provider config from Step 1 ...
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  repositories = [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      name = &#34;guardrails&#34;
+</span></span><span style=display:flex><span>      type = io.jikkou.core.repository.GitHubResourceRepository
+</span></span><span style=display:flex><span>      config = {
+</span></span><span style=display:flex><span>        repository = &#34;your-org/kafka-platform&#34;
+</span></span><span style=display:flex><span>        branch = &#34;main&#34;
+</span></span><span style=display:flex><span>        paths = [&#34;jikkou/policies&#34;]
+</span></span><span style=display:flex><span>        token = ${?GITHUB_TOKEN}
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Now your guardrails are versioned, reviewable, and shared across every environment. Change a policy, open a PR, merge it and every subsequent <code>jikkou diff</code> or <code>jikkou apply</code> picks up the new rules automatically 💪.</p><h2 id=step-3-build-the-kestra-flow><a class=heading-anchor href=#step-3-build-the-kestra-flow>#</a>Step 3: Build the Kestra Flow</h2><p>This is where everything comes together.</p><p>The Kestra flow below implements the full provisioning workflow described above (see: <a href=https://github.com/fhussonnois/orchestrating-streams/blob/main/jikkou/flows/kafka-topic-provisioning.yaml target=_blank rel="noopener noreferrer">kafka-topic-provisioning.yaml</a>
+). First, let’s create it into Kestra:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#cba6f7>id</span>: kafka-topic-provisioning
+</span></span><span style=display:flex><span><span style=color:#cba6f7>namespace</span>: platform.kafka
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>description</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>  Self-service Kafka topic provisioning with GitOps, 
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>  diff preview, and human-in-the-loop approval.</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>labels</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>team</span>: platform
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>service</span>: kafka
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>inputs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: topic
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: FORM
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>displayName</span>: Topic
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: What to create, where, and who owns it.
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputs</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: name
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: STRING
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Topic name
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Lowercase, with dots, hyphens or underscores.&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: environment
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: SELECT
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Environment
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Target cluster.&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: development
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>values</span>:
+</span></span><span style=display:flex><span>          - development
+</span></span><span style=display:flex><span>          - staging
+</span></span><span style=display:flex><span>          - production
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: owner_team
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: STRING
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Owner team
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Team accountable for this topic.&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: sizing
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: FORM
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>displayName</span>: Sizing
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: Partitioning and replication.
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputs</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: partitions
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: INT
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Partitions
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: <span style=color:#fab387>2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: replicas
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: INT
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Replication factor
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: <span style=color:#fab387>2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: retention
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: FORM
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>displayName</span>: Retention
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: How long records are kept, and how they age out.
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputs</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: retention_ms
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: INT
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Retention (ms)
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;1 hour to 7 days.&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: <span style=color:#fab387>172800000</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: cleanup_policy
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: SELECT
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Cleanup policy
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Delete old records, compact by key, or both.&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: delete
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>values</span>:
+</span></span><span style=display:flex><span>          - delete
+</span></span><span style=display:flex><span>          - compact
+</span></span><span style=display:flex><span>          - compact,delete
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>tasks</span>:
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 1. Generate the Jikkou topic YAML ──────────────────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: generate_topic_yaml
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Script
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Generate the Jikkou KafkaTopic resource file&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>script</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        cat &gt; topic.yaml &lt;&lt;&#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        apiVersion: &#34;kafka.jikkou.io/v1&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        kind: KafkaTopic
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        metadata:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          name: &#39;{{ inputs.topic.name }}&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          labels:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            environment: &#39;{{ inputs.topic.environment }}&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            owner: &#39;{{ inputs.topic.owner_team }}&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            managed-by: kestra
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            execution-id: &#39;{{ execution.id }}&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        spec:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          partitions: {{ inputs.sizing.partitions }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          replicas: {{ inputs.sizing.replicas }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          configs:
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            retention.ms: {{ inputs.retention.retention_ms }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            cleanup.policy: &#39;{{ inputs.retention.cleanup_policy }}&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        EOF
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        cat topic.yaml</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>outputFiles</span>:
+</span></span><span style=display:flex><span>      - topic.yaml
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 2. Validate the resource before touching GitHub ────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: jikkou_validate
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Script
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Validate the topic definition before any git work&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>containerImage</span>: streamthoughts/jikkou:latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>pullPolicy</span>: ALWAYS
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>user</span>: root
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_BOOTSTRAP_SERVERS</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_BOOTSTRAP_SERVERS&#39;)}}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_TRUSTSTORE_PATH</span>: <span style=color:#a6e3a1>&#34;client.truststore.jks&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_TRUSTSTORE_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_TRUSTSTORE_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_KEYSTORE_PATH</span>: <span style=color:#a6e3a1>&#34;client.keystore.p12&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_KEYSTORE_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_KEYSTORE_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_KEY_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_KEY_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>JIKKOUCONFIG</span>: .jikkou/config.json
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>namespaceFiles</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>enabled</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputFiles</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>topic.yaml</span>: <span style=color:#a6e3a1>&#34;{{ outputs.generate_topic_yaml.outputFiles[&#39;topic.yaml&#39;] }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>script</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou config set-context aiven --config-file application.conf
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou config use-context aiven
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou validate --files topic.yaml --output YAML</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 3. Run Jikkou diff against the live cluster ────────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: jikkou_diff
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Script
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Compute diff between desired state and live Kafka cluster&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>containerImage</span>: streamthoughts/jikkou:latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>user</span>: root
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>pullPolicy</span>: ALWAYS
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_BOOTSTRAP_SERVERS</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_BOOTSTRAP_SERVERS&#39;)}}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_TRUSTSTORE_PATH</span>: <span style=color:#a6e3a1>&#34;client.truststore.jks&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_TRUSTSTORE_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_TRUSTSTORE_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_KEYSTORE_PATH</span>: <span style=color:#a6e3a1>&#34;client.keystore.p12&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_KEYSTORE_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_KEYSTORE_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>KAFKA_KEY_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_KEY_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>JIKKOUCONFIG</span>: .jikkou/config.json
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>namespaceFiles</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>enabled</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputFiles</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>topic.yaml</span>: <span style=color:#a6e3a1>&#34;{{ outputs.generate_topic_yaml.outputFiles[&#39;topic.yaml&#39;] }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>script</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou config set-context aiven --config-file application.conf
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou config use-context aiven
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        # Run diff and capture the output
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        jikkou diff \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --files topic.yaml \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --output json &gt; diff_result.json 2&gt;&amp;1 || true
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        cat diff_result.json
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        # Surface diff as a Kestra output
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        DIFF_CONTENT=$(cat diff_result.json)
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        echo &#39;::{&#34;outputs&#34;:{&#34;diff_result&#34;:&#34;${DIFF_CONTENT}&#34;}}::&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>outputFiles</span>:
+</span></span><span style=display:flex><span>      - diff_result.json
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 4. Commit to a feature branch on GitHub ────────────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: create_branch_and_commit
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Push the topic YAML to a feature branch&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>containerImage</span>: alpine/git:latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>GITHUB_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>GITHUB_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputFiles</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>topic.yaml</span>: <span style=color:#a6e3a1>&#34;{{ outputs.generate_topic_yaml.outputFiles[&#39;topic.yaml&#39;] }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>      - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        BRANCH=&#34;topic/{{ inputs.topic.name }}-{{ execution.id }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        REPO_URL=&#34;https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git clone --depth 1 &#34;$REPO_URL&#34; repo
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        cd repo
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git checkout -b &#34;$BRANCH&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        mkdir -p topics/{{ inputs.topic.environment }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        cp ../topic.yaml &#34;topics/{{ inputs.topic.environment }}/{{ inputs.topic.name }}.yaml&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git config user.email &#34;kestra@your-org.com&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git config user.name &#34;Kestra Bot&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git add .
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git commit -m &#34;feat(kafka): request topic {{ inputs.topic.name }} [{{ inputs.topic.environment }}]
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        Requested by: {{ inputs.topic.owner_team }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        Execution: {{ execution.id }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        Partitions: {{ inputs.sizing.partitions }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        Replicas: {{ inputs.sizing.replicas }}
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        Retention: {{ inputs.retention.retention_ms }}ms&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        git push origin &#34;$BRANCH&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        echo &#39;::{&#34;outputs&#34;:{&#34;branch&#34;:&#34;&#39;&#34;$BRANCH&#34;&#39;&#34;}}::&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 5. Open the pull request (BEFORE anyone is asked to approve) ─</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: open_pull_request
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Open the PR carrying the topic request and its diff&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>containerImage</span>: alpine:latest
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>GH_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>GH_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>inputFiles</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>diff_result.json</span>: <span style=color:#a6e3a1>&#34;{{ outputs.jikkou_diff.outputFiles[&#39;diff_result.json&#39;] }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>      - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        # gh is not in the base image; github-cli lives in Alpine community.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        apk add --no-cache github-cli &gt; /dev/null
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        BRANCH=&#34;{{ outputs.create_branch_and_commit.vars.branch }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        # PR body is just the Jikkou diff (capped: GitHub rejects bodies
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        # over 65536 characters).
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        {
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          echo &#39;```json&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          head -c 60000 diff_result.json
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          echo &#39;```&#39;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        } &gt; pr-body.md
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        PR_URL=$(gh pr create \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --repo &#34;$GH_REPO&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --head &#34;$BRANCH&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --base main \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --title &#34;feat(kafka): provision {{ inputs.topic.name }} [{{ inputs.topic.environment }}]&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          --body-file pr-body.md)
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        echo &#34;Pull request opened: $PR_URL&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        echo &#34;::{\&#34;outputs\&#34;:{\&#34;pr_url\&#34;:\&#34;${PR_URL}\&#34;}}::&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 6. Ask the platform team to review and approve ─────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: notify_slack
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Ask for review, linking the PR and the approval page&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>url</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;SLACK_WEBHOOK_URL&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>payload</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>      {
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>        &#34;text&#34;: &#34;:kafka: *Topic Provisioning Request*\n\n*Topic:* `{{ inputs.topic.name }}`\n*Environment:* `{{ inputs.topic.environment }}`\n*Requested by:* {{ inputs.topic.owner_team }}\n*Partitions:* {{ inputs.sizing.partitions }} | *Replicas:* {{ inputs.sizing.replicas }}\n*Retention:* {{ inputs.retention.retention_ms }}ms\n*Cleanup:* {{ inputs.retention.cleanup_policy }}\n\n:memo: &lt;{{ outputs.open_pull_request.vars.pr_url }}|Review the pull request&gt; - resource + Jikkou diff\n:white_check_mark: &lt;{{ kestra.url }}ui/executions/{{ flow.namespace }}/{{ flow.id }}/{{ execution.id }}|Approve or reject in Kestra&gt;&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>      }</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 7. Pause for human approval ────────────────────────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: wait_for_approval
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.core.flow.Pause
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Wait for a platform engineer to approve or reject&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>onResume</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: approved
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: BOOL
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Approve
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Approve or reject this request.&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: review_notes
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: STRING
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>displayName</span>: Review notes
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Comment posted to the pull request.&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>defaults</span>: <span style=color:#a6e3a1>&#34;Approved&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># ── 8. Check approval decision ─────────────────────────────────</span>
+</span></span><span style=display:flex><span>  - <span style=color:#cba6f7>id</span>: check_approval
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>type</span>: io.kestra.plugin.core.flow.If
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>condition</span>: <span style=color:#a6e3a1>&#34;{{ outputs.wait_for_approval.onResume.approved }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>then</span>:
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># ── 8a. Merge the approved PR into main ────────────────────</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: merge_pr
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Merge the approved pull request&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>containerImage</span>: alpine:latest
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>GH_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>GH_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>          - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # gh is not in the base image; github-cli lives in Alpine community.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            apk add --no-cache github-cli &gt; /dev/null
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            BRANCH=&#34;{{ outputs.create_branch_and_commit.vars.branch }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            gh pr comment &#34;$BRANCH&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --repo &#34;$GH_REPO&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --body &#34;Approved in Kestra execution {{ execution.id }}: {{ outputs.wait_for_approval.onResume.review_notes }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            gh pr merge &#34;$BRANCH&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --repo &#34;$GH_REPO&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --squash \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --delete-branch
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # The squash commit now on main. Captured by PR url rather than by
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # branch, because --delete-branch just removed the branch ref.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            MERGE_SHA=$(gh pr view &#34;{{ outputs.open_pull_request.vars.pr_url }}&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --json mergeCommit --jq .mergeCommit.oid)
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            echo &#34;Merged main as $MERGE_SHA&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            echo &#34;::{\&#34;outputs\&#34;:{\&#34;merge_sha\&#34;:\&#34;${MERGE_SHA}\&#34;}}::&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># ── 8b. Read the definition back from main ─────────────────</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: fetch_from_main
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Fetch the merged topic definition from main&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>containerImage</span>: alpine/git:latest
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>GITHUB_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>GITHUB_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>          - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git&#34; repo
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            cp &#34;repo/topics/{{ inputs.topic.environment }}/{{ inputs.topic.name }}.yaml&#34; topic.yaml
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            cat topic.yaml</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>outputFiles</span>:
+</span></span><span style=display:flex><span>          - topic.yaml
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># ── 8c. Reconcile the cluster from what main now holds ─────</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: jikkou_apply
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Apply the merged topic definition to the Kafka cluster&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>containerImage</span>: streamthoughts/jikkou:latest
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>user</span>: root
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>KAFKA_BOOTSTRAP_SERVERS</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_BOOTSTRAP_SERVERS&#39;)}}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>KAFKA_TRUSTSTORE_PATH</span>: <span style=color:#a6e3a1>&#34;client.truststore.jks&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>KAFKA_TRUSTSTORE_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_TRUSTSTORE_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>KAFKA_KEYSTORE_PATH</span>: <span style=color:#a6e3a1>&#34;client.keystore.p12&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>KAFKA_KEYSTORE_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_KEYSTORE_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>KAFKA_KEY_PASSWORD</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;KAFKA_KEY_PASSWORD&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>JIKKOUCONFIG</span>: .jikkou/config.json
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>namespaceFiles</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>enabled</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>inputFiles</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>topic.yaml</span>: <span style=color:#a6e3a1>&#34;{{ outputs.fetch_from_main.outputFiles[&#39;topic.yaml&#39;] }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>          - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            jikkou config set-context aiven --config-file application.conf
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            jikkou config use-context aiven
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # Do not let a failed apply kill the task: main has already been
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # merged, so the next task has to be given the chance to roll it back.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            if jikkou apply --files topic.yaml --output json; then
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              APPLY_OK=true
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            else
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              APPLY_OK=false
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            fi
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # jikkou&#39;s JSON output ends without a newline, so open a fresh
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # line first: Kestra only parses the ::{...}:: directive when it
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # sits alone on its own line.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            printf &#39;\n::{&#34;outputs&#34;:{&#34;apply_ok&#34;:&#34;%s&#34;}}::\n&#39; &#34;$APPLY_OK&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># ── 8d. Did the cluster accept it? ─────────────────────────</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: check_apply
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: io.kestra.plugin.core.flow.If
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>condition</span>: <span style=color:#a6e3a1>&#34;{{ outputs.jikkou_apply.vars.apply_ok == &#39;true&#39; }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>then</span>:
+</span></span><span style=display:flex><span>          - <span style=color:#cba6f7>id</span>: notify_success
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>type</span>: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>url</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;SLACK_WEBHOOK_URL&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>payload</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              {
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                &#34;text&#34;: &#34;:white_check_mark: *Topic `{{ inputs.topic.name }}` provisioned successfully!*\n\n*Environment:* {{ inputs.topic.environment }}\n*Notes:* {{ outputs.wait_for_approval.onResume.review_notes }}\n\n:twisted_rightwards_arrows: &lt;{{ outputs.open_pull_request.vars.pr_url }}|Pull request merged to main&gt;&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              }</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>else</span>:
+</span></span><span style=display:flex><span>          - <span style=color:#cba6f7>id</span>: revert_merge
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Revert the merge commit, main no longer claims the topic&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>containerImage</span>: alpine/git:latest
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>              <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>              <span style=color:#cba6f7>GITHUB_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#cba6f7>GITHUB_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>              - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                # Full clone on purpose. On a --depth 1 clone git treats the
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                # grafted HEAD as a root commit and reverts the WHOLE tree,
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                # which wipes main instead of undoing one topic.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                git clone --branch main https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git&#34; repo
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                cd repo
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                git config user.email &#34;kestra@your-org.com&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                git config user.name &#34;Kestra Bot&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                git revert --no-edit &#34;{{ outputs.merge_pr.vars.merge_sha }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                # Safety net: the revert must touch exactly this topic&#39;s file.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                EXPECTED=&#34;topics/{{ inputs.topic.environment }}/{{ inputs.topic.name }}.yaml&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                CHANGED=$(git show --name-only --pretty=format: HEAD | sed &#39;/^$/d&#39;)
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                if [ &#34;$CHANGED&#34; != &#34;$EXPECTED&#34; ]; then
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                  echo &#34;Refusing to push. Revert touched unexpected paths:&#34; &gt;&amp;2
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                  echo &#34;$CHANGED&#34; &gt;&amp;2
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                  exit 1
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                fi
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                git push origin main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>          - <span style=color:#cba6f7>id</span>: comment_rollback_on_pr
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Record the rollback on the pull request&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>containerImage</span>: alpine:latest
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>              <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>              <span style=color:#cba6f7>GH_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#cba6f7>GH_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>              - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                apk add --no-cache github-cli &gt; /dev/null
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                gh pr comment &#34;{{ outputs.open_pull_request.vars.pr_url }}&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                  --body &#34;Jikkou apply failed against \`{{ inputs.topic.environment }}\`. Merge commit {{ outputs.merge_pr.vars.merge_sha }} has been reverted on main.&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>          - <span style=color:#cba6f7>id</span>: notify_apply_failure
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>type</span>: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>url</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;SLACK_WEBHOOK_URL&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>payload</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              {
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                &#34;text&#34;: &#34;:rotating_light: *Apply failed for `{{ inputs.topic.name }}` - main was rolled back*\n\n*Environment:* `{{ inputs.topic.environment }}`\n*Reverted commit:* `{{ outputs.merge_pr.vars.merge_sha }}`\n\n:twisted_rightwards_arrows: &lt;{{ outputs.open_pull_request.vars.pr_url }}|Pull request&gt;\n:mag: &lt;{{ kestra.url }}ui/executions/{{ flow.namespace }}/{{ flow.id }}/{{ execution.id }}|Execution logs&gt;&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              }</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>          - <span style=color:#cba6f7>id</span>: fail_execution
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Surface the failure in the execution state&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>              - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                echo &#34;jikkou apply failed; main reverted&#34; &gt;&amp;2
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>                exit 1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>else</span>:
+</span></span><span style=display:flex><span>      <span style=color:#6c7086;font-style:italic># ── 8e. Handle rejection ───────────────────────────────────</span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: close_pull_request
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.shell.Commands
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>description</span>: <span style=color:#a6e3a1>&#34;Close the pull request and delete its branch&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>containerImage</span>: alpine:latest
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>taskRunner</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>type</span>: io.kestra.plugin.scripts.runner.docker.Docker
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>GH_TOKEN</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_TOKEN&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>GH_REPO</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;GITHUB_REPO&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>commands</span>:
+</span></span><span style=display:flex><span>          - |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            # gh is not in the base image; github-cli lives in Alpine community.
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            apk add --no-cache github-cli &gt; /dev/null
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            BRANCH=&#34;{{ outputs.create_branch_and_commit.vars.branch }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            gh pr close &#34;$BRANCH&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --repo &#34;$GH_REPO&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --delete-branch \
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>              --comment &#34;Rejected in Kestra execution {{ execution.id }}: {{ outputs.wait_for_approval.onResume.review_notes }}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#cba6f7>id</span>: notify_rejection
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>type</span>: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>url</span>: <span style=color:#a6e3a1>&#34;{{ secret(&#39;SLACK_WEBHOOK_URL&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>payload</span>: |<span style=color:#6c7086>
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          {
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>            &#34;text&#34;: &#34;:x: *Topic `{{ inputs.topic.name }}` request was rejected.*\n\n*Reason:* {{ outputs.wait_for_approval.onResume.review_notes }}\n\n:twisted_rightwards_arrows: &lt;{{ outputs.open_pull_request.vars.pr_url }}|Pull request closed&gt;&#34;
+</span></span></span><span style=display:flex><span><span style=color:#6c7086>          }</span>
+</span></span></code></pre></div><p>After, you will have to copy your <code>application.conf</code>, as well as, <code>client.keystore.p12</code> and <code>client.truststore.jks</code> files in the namespace <code>platform.kafka</code>as Namespace Files.</p><p>Those files are directly used by our Flow.</p><p><img src=/images/posts/kafka-topic-as-a-service/kestra-namespace-files.png alt="Kestra — Namespace Files" loading=lazy></p><p><em>Kestra — Namespace Files</em></p><p>Then, go to the Flow and click on the <code>Execute</code> button to provision a new Kafka topic.</p><p><img src=/images/posts/kafka-topic-as-a-service/kestra-execute.png alt="Kestra — Execute" loading=lazy></p><p>Finally, click on the <code>Resume</code> button after receiving the Slack notification (or once your Flow is paused waiting for an approval) to complete the execution:</p><p><img src=/images/posts/kafka-topic-as-a-service/kestra-resume.png alt="Kestra — Resume" loading=lazy></p><p><img src=/images/posts/kafka-topic-as-a-service/kestra-gantt.png alt="Kestra — Resume | Flow Gantt View" loading=lazy></p><p><em>Kestra — Resume | Flow Gantt View</em></p><p>You can now go back to the Aiven console to verify that your topic has been created 😎.</p><h2 id=conclusion><a class=heading-anchor href=#conclusion>#</a>Conclusion</h2><p>In this article, we’ve only scratched the surface of the possibilities offered by Kestra and Jikkou for setting up a self-serve Kafka platform. For example, we could create and schedule a workflow to automatically detect discrepancies between our Git repository and a target cluster, or automate the creation of topics when switching from a staging to a production environment.</p><p>And because Jikkou supports ACLs, Quotas, Schema Registry subjects, and Kafka Connect connectors with the same declarative model, extending this to a full Kafka self-service platform is straightforward.</p><p>Additionally, if you have Kestra Enterprise Edition, you can turn this flow into an <a href=https://kestra.io/docs/enterprise/scalability/apps target=_blank rel="noopener noreferrer">App</a>
+to build a custom UI for your workflow.</p><p>If you find the Jikkou project valuable, I kindly ask you to show your support by sharing this article and spreading the word📣. You can even show your support by giving a ⭐ on the <a href=https://github.com/streamthoughts/jikkou target=_blank rel="noopener noreferrer">GitHub</a>
+repository.🙏</p><p>We also welcome contributions from the community. If you have any ideas or specific project needs, please feel free to reach out and propose them. You can actively contribute to the project by creating <a href=https://github.com/streamthoughts/jikkou/pulls target=_blank rel="noopener noreferrer">pull requests</a>
+(PR).</p><p>And if you’re exploring this with Kestra, the community <a href=https://kestra.io/slack target=_blank rel="noopener noreferrer">Slack</a>
+is the right place to dig in.</p><p>Thank you very much.</p></div><nav class=post-nav><a class=prev href=https://www.fhussonnois.dev/posts/orchestrating-streams-episode-2-consuming-kafka-topics-from-kestra/>Orchestrating Streams: Episode 2 — Consuming Kafka Topics From Kestra</a></nav></article></main><footer class=site-footer><div class=container><div class=footer-socials><a href=https://github.com/fhussonnois target=_blank rel=noopener aria-label=GitHub><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg>
+</a><a href=https://twitter.com/fhussonnois target=_blank rel=noopener aria-label=Twitter><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1.0 3-1.2 3-1.2z"/></svg>
+</a><a href=https://www.linkedin.com/in/florian-hussonnois/ target=_blank rel=noopener aria-label=LinkedIn><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+</a><a href=https://stackoverflow.com/users/3660859/fhussonnois target=_blank rel=noopener aria-label="Stack Overflow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 20V12"/><path d="M20 20V12"/><path d="M7 17h10"/><path d="M7.5 13.5l9.2 1.8"/><path d="M8.8 10.1l8.5 3.9"/><path d="M11 7l7.1 5.8"/></svg></a></div><p class=footer-prompt><span class=prompt>>_</span> &copy; 2026 Florian Hussonnois</p></div></footer><script src=/js/theme-toggle.min.8c15e1b03ddad9066a2d55e38fe897951bafbc6b24db02de0ea1d219296def11.js></script></body></html>

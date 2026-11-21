@@ -1,0 +1,286 @@
+<!doctype html><html lang=en-us data-theme=light><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Kafka Connect + Jikkou: Easily manage Kafka connectors | Florian Hussonnois</title><meta name=description content="Learn how to use Jikkou to easily deploy, manage, and automate the lifecycle of your Kafka Connect connectors using a declarative, GitOps-friendly approach."><meta name=author content="Florian Hussonnois"><link rel=canonical href=https://www.fhussonnois.dev/posts/kafka-connect-jikkou-easily-manage-kafka-connectors/><meta property="og:type" content="article"><meta property="og:title" content="Kafka Connect + Jikkou: Easily manage Kafka connectors | Florian Hussonnois"><meta property="og:description" content="Learn how to use Jikkou to easily deploy, manage, and automate the lifecycle of your Kafka Connect connectors using a declarative, GitOps-friendly approach."><meta property="og:url" content="https://www.fhussonnois.dev/posts/kafka-connect-jikkou-easily-manage-kafka-connectors/"><meta property="og:site_name" content="Florian Hussonnois — Apache Kafka, Kestra & Data Streaming"><meta property="og:image" content="https://www.fhussonnois.dev/images/posts/kafka-connect-jikkou/cover.jpg"><meta property="article:published_time" content="2023-10-18T00:00:00Z"><meta property="article:author" content="Florian Hussonnois"><meta property="article:tag" content="apache kafka"><meta property="article:tag" content="kafka connect"><meta property="article:tag" content="jikkou"><meta property="article:tag" content="gitops"><meta property="article:tag" content="devops"><meta property="article:tag" content="open source"><meta name=twitter:card content="summary_large_image"><meta name=twitter:site content="@fhussonnois"><meta name=twitter:creator content="@fhussonnois"><meta name=twitter:title content="Kafka Connect + Jikkou: Easily manage Kafka connectors"><meta name=twitter:description content="Learn how to use Jikkou to easily deploy, manage, and automate the lifecycle of your Kafka Connect connectors using a declarative, GitOps-friendly approach."><meta name=twitter:image content="https://www.fhussonnois.dev/images/posts/kafka-connect-jikkou/cover.jpg"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kafka Connect \u002b Jikkou: Easily manage Kafka connectors","description":"Learn how to use Jikkou to easily deploy, manage, and automate the lifecycle of your Kafka Connect connectors using a declarative, GitOps-friendly approach.","url":"https:\/\/www.fhussonnois.dev\/posts\/kafka-connect-jikkou-easily-manage-kafka-connectors\/","datePublished":"2023-10-18T00:00:00Z","dateModified":"2023-10-18T00:00:00Z","image":"https:\/\/www.fhussonnois.dev\/images\/posts\/kafka-connect-jikkou\/cover.jpg","author":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev/about/"},"publisher":{"@type":"Person","name":"Florian Hussonnois","url":"https://www.fhussonnois.dev"},"keywords":["apache kafka","kafka connect","jikkou","gitops","devops","open source"]}</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel=stylesheet><script>(function(){var e=localStorage.getItem("theme");e==="dark"&&document.documentElement.setAttribute("data-theme","dark")})()</script><link rel=stylesheet href=/css/main.min.609ff1b5cd149b19c6eebb465010d9ef1dd831c368abb5c128051ea9d3d023f9.css><link rel=icon type=image/png href=/images/avatar.png></head><body><a class=skip-to-content href=#main-content>Skip to content</a><nav class=site-nav role=navigation aria-label="Main navigation"><div class=nav-inner><a class=nav-logo href=/><span class=prompt>>_</span> fhussonnois.dev</a><ul class=nav-links id=nav-links><li><a href=/posts/ aria-current=section>Blog</a></li><li><a href=/projects/>Projects</a></li><li><a href=/contributions/>Contributions</a></li><li><a href=/conferences/>Conferences</a></li><li><a href=/about/>About</a></li><li><a href=/tags/>Tags</a></li></ul><div class=nav-right><button class=theme-toggle aria-label="Toggle dark mode">
+<span class=icon-sun><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</span><span class=icon-moon><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</span></button>
+<button class=nav-toggle aria-label="Toggle menu" aria-expanded=false>
+<svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></nav><main id=main-content><article class=container><header class=post-header><h1 class=post-title>Kafka Connect + Jikkou: Easily manage Kafka connectors</h1><div class=post-meta><time datetime=2023-10-18>October 18, 2023</time>
+<span>1648 words</span>
+<span>8 min read</span></div><div class=post-tags><a class=tag-pill href=/tags/apache-kafka/>apache kafka</a>
+<a class=tag-pill href=/tags/kafka-connect/>kafka connect</a>
+<a class=tag-pill href=/tags/jikkou/>jikkou</a>
+<a class=tag-pill href=/tags/gitops/>gitops</a>
+<a class=tag-pill href=/tags/devops/>devops</a>
+<a class=tag-pill href=/tags/open-source/>open source</a></div></header><div class=prose><p><img src=/images/posts/kafka-connect-jikkou/cover.jpg alt="Photo by Miltiadis Fragkidis on Unsplash" loading=lazy></p><p><em>Photo by <a href=https://unsplash.com/fr/@_miltiadis_ target=_blank rel="noopener noreferrer">Miltiadis Fragkidis</a>
+on <a href=https://unsplash.com target=_blank rel="noopener noreferrer">Unsplash</a></em></p><p><em>This blog post was originally published on <a href=https://medium.com/@fhussonnois/kafka-connect-jikkou-easily-manage-kafka-connectors-d4dd2b8a560c target=_blank rel="noopener noreferrer">Medium</a></em></p><p>Kafka Connect is a widely used solution to stream data into <a href=https://kafka.apache.org/documentation/ target=_blank rel="noopener noreferrer">Apache Kafka</a>
+and to transfer data from Kafka to external systems for further use, such as online analytical processing.</p><p>One of the main advantages of Kafka Connect is its ease of use. Basically, all you have to do is define the JSON configuration corresponding to the connector you want to run and push it to the REST API of your Kafka Connect cluster to start data integration.</p><p>And this is where the trouble starts. How to manage all these configurations efficiently, and more especially if you have to run dozens and dozens of connectors on your platform?</p><p>Well, if you&rsquo;re lucky enough to be running Kafka Connect on <a href=https://kubernetes.io/ target=_blank rel="noopener noreferrer"><strong>Kubernetes</strong></a>
+, then you probably already use an operator such as <a href=https://strimzi.io/ target=_blank rel="noopener noreferrer">Strimzi</a>
+to manage both the configuration and lifecycle of your connectors. To be honest, Strimzi was one of the best options I&rsquo;ve had the opportunity to implement, to manage Kafka Connect at scale.</p><p>But unfortunately, not everybody runs Kafka Connect on Kubernetes. Sometimes, Kafka Connect may be run directly on virtual machines (Yes, there are still enterprises doing this!), or maybe Kafka Connect is running as a managed service provided by an Independent software vendor (ISV) or a Cloud Provider such as Amazon.</p><p>So, which solution to use in such contexts?</p><h2 id=jikkou-to-the-rescue><a class=heading-anchor href=#jikkou-to-the-rescue>#</a>Jikkou to the rescue</h2><p><img src=/images/posts/kafka-connect-jikkou/jikkou-logo.png alt="Jikkou Logo" loading=lazy></p><p><a href=https://github.com/streamthoughts/jikkou target=_blank rel="noopener noreferrer"><strong>Jikkou</strong></a>
+is a modern, intuitive command-line tool designed to provide an efficient and easy way to manage, automate, and provision resources on the self-service platform that is part of your Event-Driven <a href=https://martinfowler.com/articles/data-mesh-principles.html target=_blank rel="noopener noreferrer">Data Mesh</a>
+(or, more simply, on any Apache Kafka infrastructure).</p><p>Jikkou adopts a declarative approach, using YAML descriptor files to define the desired state of resources such as topics, schemas, and, ACLs, etc.</p><p>Since version 0.30.0, Jikkou has provided the capability to deploy and manage Kafka connectors. In this blog post, I&rsquo;d like to explore how Jikkou can help you easily manage your connectors.</p><h2 id=getting-started><a class=heading-anchor href=#getting-started>#</a>Getting started</h2><h3 id=installing-kafka-connect><a class=heading-anchor href=#installing-kafka-connect>#</a>Installing Kafka Connect</h3><p>Download the Docker Compose file using the following command:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>curl -o docker-compose.yml <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>https://raw.githubusercontent.com/streamthoughts/jikkou/docker-compose.yml
+</span></span></code></pre></div><p>Make sure that Docker is running. Then, use the following command to start Kafka and Kafka Connect:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>docker compose up -d
+</span></span></code></pre></div><p>Finally, check that services are up and running the following commands:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Checking if Kafka is started</span>
+</span></span><span style=display:flex><span>$ docker logs kafka | grep <span style=color:#a6e3a1>&#34;Kafka Server started&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Checking if Kafka Connect is started</span>
+</span></span><span style=display:flex><span>$ docker logs connect | grep <span style=color:#a6e3a1>&#34;Kafka Connect started&#34;</span>
+</span></span></code></pre></div><h3 id=installing-jikkou><a class=heading-anchor href=#installing-jikkou>#</a>Installing Jikkou</h3><p>The latest stable release of jikkou for Linux and macOS can be easily installed via <a href=https://sdkman.io/ target=_blank rel="noopener noreferrer">SDKMan</a>
+:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ sdk install jikkou
+</span></span></code></pre></div><p>Make sure Jikkou is properly installed, by running the following command:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou --version
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic># (output)</span>
+</span></span><span style=display:flex><span>Jikkou version <span style=color:#a6e3a1>&#34;0.30.0&#34;</span> 2023-10-16
+</span></span><span style=display:flex><span>JVM: 17.0.8 <span style=color:#89dceb;font-weight:700>(</span>Oracle Corporation Substrate VM GraalVM 22.3.3 Java <span style=color:#fab387>17</span> CE<span style=color:#89dceb;font-weight:700>)</span>
+</span></span></code></pre></div><blockquote><p><strong>Note</strong>: For detailed instructions on installing Jikkou, you can refer to the documentation at: <a href=https://streamthoughts.github.io/jikkou/docs/install/ target=_blank rel="noopener noreferrer">https://streamthoughts.github.io/jikkou/docs/install/</a></p></blockquote><p>Next, let&rsquo;s configure the <strong>Jikkou CLI</strong> to manage our local Kafka Connect environment. For this, you will first need to create a configuration file (<code>./jikkou-kafka-connect.conf</code>) with the following content:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-text data-lang=text><span style=display:flex><span># ./jikkou-connect.conf
+</span></span><span style=display:flex><span>jikkou {
+</span></span><span style=display:flex><span>  extensions.provider.kafkaconnect.enabled = true
+</span></span><span style=display:flex><span>  kafkaConnect {
+</span></span><span style=display:flex><span>    clusters = [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        name = &#34;my-connect-cluster&#34;
+</span></span><span style=display:flex><span>        url = &#34;http://localhost:8083&#34;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><blockquote><p><strong>Note</strong>: The <code>jikkou.kafkaConnect.clusters</code> config property is used to define the list of connect clusters the CLI can connect to.</p></blockquote><p>Then, you need to configure Jikkou CLI to use that configuration file using the below commands:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Create a context named &#39;connect&#39;</span>
+</span></span><span style=display:flex><span>$ jikkou config set-context connect <span style=color:#89b4fa>\
+</span></span></span><span style=display:flex><span>--config-file <span style=color:#a6e3a1>&#34;`pwd`/jikkou-connect.conf&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6c7086;font-style:italic># Set the current context to &#39;connect</span>
+</span></span><span style=display:flex><span>$ jikkou config use-context connect
+</span></span></code></pre></div><p>Finally, let&rsquo;s check if Jikkou can access our Connect cluster using the <code>jikkou health</code> command.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou health get kafkaconnect
+</span></span></code></pre></div><p>If everything is OK, Jikkou should output something similar to:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;KafkaConnect&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>status</span>: <span style=color:#a6e3a1>&#34;UP&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>details</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>my-connect-cluster</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>status</span>: <span style=color:#a6e3a1>&#34;UP&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>details</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>version</span>: <span style=color:#a6e3a1>&#34;7.5.0-ccs&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>commit</span>: <span style=color:#a6e3a1>&#34;ff3c201baa948d97889dc26c99d7cdc23d038f2e&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>kafkaClusterId</span>: <span style=color:#a6e3a1>&#34;xtzWWN4bTjitpL3kfd9s5g&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>url</span>: <span style=color:#a6e3a1>&#34;http://localhost:8083&#34;</span>
+</span></span></code></pre></div><h3 id=create-your-first-connector><a class=heading-anchor href=#create-your-first-connector>#</a>Create Your First Connector</h3><p>First, let&rsquo;s create a YAML file that describes the configuration of the connector we wish to deploy. Here, we&rsquo;ll simply use the <code>FileStreamSink</code> connector that ships with Kafka.</p><p>Here is the resource definition format to be used to define a <code>KafkaConnector</code>:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># file: ./kafka-connector-filestream-sink.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.jikkou.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaConnector&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># The name of the connector</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#6c7086;font-style:italic># The name of the cluster to create the connector instance in</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>kafka.jikkou.io/connect-cluster</span>: <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># Name or alias of the class for this connector.</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>connectorClass</span>: <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># The maximum number of tasks for the Kafka Connector.</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>tasksMax</span>: <span style=color:#fab387>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># Configuration properties of the connector.</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>config</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>file</span>: <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>topics</span>: <span style=color:#a6e3a1>&#34;connect-test&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># The state the connector should be in. Defaults to running.</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>state</span>: <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>
+</span></span></code></pre></div><blockquote><p><strong>Important</strong>: The resource definition must contain the <code>kafka.jikkou.io/connect-cluster</code> to indicate the name of the connect cluster to create the connector instance in. The name must match one of the clusters defined in the Jikkou CLI&rsquo;s configuration.</p></blockquote><p>Now, let&rsquo;s deploy the connector using the <code>jikkou apply</code> command as follows:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou apply -f ./kafka-connector-filestream-sink.yaml -o JSON
+</span></span></code></pre></div><p>Jikkou will output all the changes applied in order to create the described connector.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>[ {
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;status&#34;</span> : <span style=color:#a6e3a1>&#34;CHANGED&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;changed&#34;</span> : <span style=color:#fab387>true</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;failed&#34;</span> : <span style=color:#fab387>false</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;end&#34;</span> : <span style=color:#fab387>1697633185560</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;data&#34;</span> : {
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;apiVersion&#34;</span> : <span style=color:#a6e3a1>&#34;core.jikkou.io/v1beta2&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;kind&#34;</span> : <span style=color:#a6e3a1>&#34;GenericResourceChange&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;metadata&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span> : <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;labels&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;kafka.jikkou.io/connect-cluster&#34;</span> : <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;annotations&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;jikkou.io/managed-by-location&#34;</span> : <span style=color:#a6e3a1>&#34;./connect/kafka-connector-filestream-sink.yaml&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;change&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;connectorClass&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;tasksMax&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#fab387>1</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;state&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;config&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;file&#34;</span> : {
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;topics&#34;</span> : {
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;connect-test&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;ADD&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>} ]
+</span></span></code></pre></div><p>Finally, we can use Jikkou to retrieve the status of the connectors currently on our Kafka Connect cluster with:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>$ jikkou get kafkaconnectors --expand-status
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.jikkou.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaConnector&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>kafka.jikkou.io/connect-cluster</span>: <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>jikkou.io/generated</span>: <span style=color:#a6e3a1>&#34;2023-10-18T00:00:00.000000Z&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>connectorClass</span>: <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>tasksMax</span>: <span style=color:#fab387>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>config</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>file</span>: <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>topics</span>: <span style=color:#a6e3a1>&#34;connect-test&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>state</span>: <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>status</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>connectorStatus</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>connector</span>:
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>state</span>: <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>workerId</span>: <span style=color:#a6e3a1>&#34;connect:8083&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>tasks</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#cba6f7>id</span>: <span style=color:#fab387>0</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>state</span>: <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>workerId</span>: <span style=color:#a6e3a1>&#34;connect:8083&#34;</span>
+</span></span></code></pre></div><p>As you can see in the above example, by specifying the <code>--expand-status</code> option you can retrieve the current status of the connector and its tasks.</p><h3 id=pausing-and-resuming-your-connector><a class=heading-anchor href=#pausing-and-resuming-your-connector>#</a>Pausing and Resuming Your Connector</h3><p>Jikkou also lets you manage the status of your connectors. For example, you may want to pause your connector. For this, all you need to do is to set the field <code>spec.state</code> of your connector definition to <code>PAUSED</code> and to re-execute the <code>jikkou apply</code> command.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># file: ./kafka-connector-filestream-sink.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.jikkou.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaConnector&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>kafka.jikkou.io/connect-cluster</span>: <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>connectorClass</span>: <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>tasksMax</span>: <span style=color:#fab387>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>config</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>file</span>: <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>topics</span>: <span style=color:#a6e3a1>&#34;connect-test&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#6c7086;font-style:italic># EDIT</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>state</span>: <span style=color:#a6e3a1>&#34;PAUSED&#34;</span>
+</span></span></code></pre></div><p>Behind the scenes, Jikkou interacts with your Connect server&rsquo;s REST API to modify the connector&rsquo;s state.</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>[ {
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;status&#34;</span> : <span style=color:#a6e3a1>&#34;CHANGED&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;changed&#34;</span> : <span style=color:#fab387>true</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;failed&#34;</span> : <span style=color:#fab387>false</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;end&#34;</span> : <span style=color:#fab387>1697634845914</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;data&#34;</span> : {
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;apiVersion&#34;</span> : <span style=color:#a6e3a1>&#34;core.jikkou.io/v1beta2&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;kind&#34;</span> : <span style=color:#a6e3a1>&#34;GenericResourceChange&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;metadata&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span> : <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;labels&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;kafka.jikkou.io/connect-cluster&#34;</span> : <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;annotations&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;jikkou.io/managed-by-location&#34;</span> : <span style=color:#a6e3a1>&#34;./kafka-connector-filestream-sink.yaml&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;change&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;UPDATE&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;connectorClass&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;NONE&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;tasksMax&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#fab387>1</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#fab387>1</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;NONE&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;state&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;PAUSED&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;UPDATE&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;config&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;file&#34;</span> : {
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;NONE&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;topics&#34;</span> : {
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;connect-test&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;after&#34;</span> : <span style=color:#a6e3a1>&#34;connect-test&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;NONE&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>} ]
+</span></span></code></pre></div><p>Later, if you need to resume the connector just set back the <code>spec.status</code> field to <code>RUNNING</code>.</p><h3 id=deleting-your-connector><a class=heading-anchor href=#deleting-your-connector>#</a>Deleting Your Connector</h3><p>Last but not least, you can delete your connector by adding the annotation <code>jikkou.io/delete: true</code> to your resource as follows:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#6c7086;font-style:italic># file: ./kafka-connector-filestream-sink.yaml</span>
+</span></span><span style=display:flex><span><span style=color:#fab387>---</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>apiVersion</span>: <span style=color:#a6e3a1>&#34;kafka.jikkou.io/v1beta1&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>kind</span>: <span style=color:#a6e3a1>&#34;KafkaConnector&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>name</span>: <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>kafka.jikkou.io/connect-cluster</span>: <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>jikkou.io/delete</span>: <span style=color:#fab387>true</span>
+</span></span><span style=display:flex><span><span style=color:#cba6f7>spec</span>:
+</span></span><span style=display:flex><span>  ...
+</span></span></code></pre></div><p>Then, you can run the <code>jikkou apply</code> command to execute the change:</p><div class=highlight><pre tabindex=0 style=color:#cdd6f4;background-color:#1e1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>[ {
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;status&#34;</span> : <span style=color:#a6e3a1>&#34;CHANGED&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;changed&#34;</span> : <span style=color:#fab387>true</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;failed&#34;</span> : <span style=color:#fab387>false</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;end&#34;</span> : <span style=color:#fab387>1697635257032</span>,
+</span></span><span style=display:flex><span>  <span style=color:#cba6f7>&#34;data&#34;</span> : {
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;apiVersion&#34;</span> : <span style=color:#a6e3a1>&#34;core.jikkou.io/v1beta2&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;kind&#34;</span> : <span style=color:#a6e3a1>&#34;GenericResourceChange&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;metadata&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;name&#34;</span> : <span style=color:#a6e3a1>&#34;local-file-sink&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;labels&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;kafka.jikkou.io/connect-cluster&#34;</span> : <span style=color:#a6e3a1>&#34;my-connect-cluster&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;annotations&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;jikkou.io/delete&#34;</span> : <span style=color:#fab387>true</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;jikkou.io/managed-by-location&#34;</span> : <span style=color:#a6e3a1>&#34;./kafka-connector-filestream-sink.yaml&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#cba6f7>&#34;change&#34;</span> : {
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;DELETE&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;connectorClass&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;FileStreamSink&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;DELETE&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;tasksMax&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#fab387>1</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;DELETE&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;state&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;RUNNING&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;DELETE&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#cba6f7>&#34;config&#34;</span> : {
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;file&#34;</span> : {
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;/tmp/test.sink.txt&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;DELETE&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        <span style=color:#cba6f7>&#34;topics&#34;</span> : {
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;before&#34;</span> : <span style=color:#a6e3a1>&#34;connect-test&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#cba6f7>&#34;operation&#34;</span> : <span style=color:#a6e3a1>&#34;DELETE&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>} ]
+</span></span></code></pre></div><p>Et voila!</p><h2 id=conclusion><a class=heading-anchor href=#conclusion>#</a>Conclusion</h2><p>Jikkou is a very useful and easy-to-use tool for managing your Kafka connectors which can be a good alternative to <a href=https://strimzi.io/ target=_blank rel="noopener noreferrer">Strimzi</a>
+operator if you are not running Kafka Connect on Kubernetes.</p><p>Of course, Jikkou can also be used to manage all the resources that compose your Apache Kafka platform, while integrating perfectly into a GitOps approach.</p><p>If you&rsquo;d like to learn more about Jikkou, I highly recommend reading these articles:</p><ul><li><a href=https://medium.com/@fhussonnois/why-is-managing-kafka-topics-still-such-a-pain-introducing-jikkou-4ee9d5df948 target=_blank rel="noopener noreferrer"><strong>Why is Managing Kafka Topics Still Such a Pain? Introducing Jikkou!</strong></a></li><li><a href=https://medium.com/@fhussonnois/jikkou-declarative-acls-configuration-for-apache-kafka-and-schema-registry-on-aiven-a3a48b8fc950 target=_blank rel="noopener noreferrer"><strong>Jikkou: Declarative ACLs configuration for Apache Kafka and Schema Registry on Aiven</strong></a></li><li><a href=https://medium.com/@fhussonnois/gitops-kafka-enabling-smooth-and-seamless-data-schema-management-with-jikkou-and-github-actions-d920a6a14bb target=_blank rel="noopener noreferrer"><strong>GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions</strong></a></li></ul><p>I hope you&rsquo;ve enjoyed this article and that some of you will find it useful.</p><p>If you find the Jikkou project valuable, I kindly ask you to show your support by sharing this article and spreading the word. You can even show your support by giving a star on the <a href=https://github.com/streamthoughts/jikkou target=_blank rel="noopener noreferrer">GitHub</a>
+repository.</p><p>We also welcome contributions from the community. If you have any ideas or specific project needs, please feel free to reach out and propose them. You can actively contribute to the project by creating <a href=https://github.com/streamthoughts/jikkou/pulls target=_blank rel="noopener noreferrer">pull requests</a>
+(PR).</p><p>Thank you very much.</p><p>Follow me on Twitter/X: <a href=https://twitter.com/fhussonnois target=_blank rel="noopener noreferrer">@fhussonnois</a></p></div><nav class=post-nav><a class=prev href=https://www.fhussonnois.dev/posts/gitops-kafka-schema-management-jikkou-github-actions/>GitOps & Kafka: Enabling smooth and seamless Data Schema management with Jikkou and GitHub Actions</a>
+<a class=next href=https://www.fhussonnois.dev/posts/orchestration/>Navigating Complexity: The Rise of Orchestration Platforms in a Disaggregated Software Architecture Landscape</a></nav></article></main><footer class=site-footer><div class=container><div class=footer-socials><a href=https://github.com/fhussonnois target=_blank rel=noopener aria-label=GitHub><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg>
+</a><a href=https://twitter.com/fhussonnois target=_blank rel=noopener aria-label=Twitter><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1.0 3-1.2 3-1.2z"/></svg>
+</a><a href=https://www.linkedin.com/in/florian-hussonnois/ target=_blank rel=noopener aria-label=LinkedIn><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+</a><a href=https://stackoverflow.com/users/3660859/fhussonnois target=_blank rel=noopener aria-label="Stack Overflow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 20V12"/><path d="M20 20V12"/><path d="M7 17h10"/><path d="M7.5 13.5l9.2 1.8"/><path d="M8.8 10.1l8.5 3.9"/><path d="M11 7l7.1 5.8"/></svg></a></div><p class=footer-prompt><span class=prompt>>_</span> &copy; 2026 Florian Hussonnois</p></div></footer><script src=/js/theme-toggle.min.8c15e1b03ddad9066a2d55e38fe897951bafbc6b24db02de0ea1d219296def11.js></script></body></html>
