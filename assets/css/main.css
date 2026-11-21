@@ -886,19 +886,6 @@ h3 { font-size: 1.25rem; }
   }
 }
 
-/* --- View All link --- */
-.view-all {
-  text-align: center;
-  margin-top: 1rem;
-  margin-bottom: 3rem;
-}
-
-.view-all a {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
 /* --- Main content spacing --- */
 main {
   min-height: calc(100vh - var(--nav-height) - 200px);
