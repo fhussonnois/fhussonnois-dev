@@ -12,5 +12,7 @@
   {{- partial "footer.html" . -}}
   {{ $js := resources.Get "js/theme-toggle.js" | minify | fingerprint }}
   <script src="{{ $js.RelPermalink }}"></script>
+  {{ $copyJs := resources.Get "js/code-copy.js" | minify | fingerprint }}
+  <script src="{{ $copyJs.RelPermalink }}" defer></script>
 </body>
 </html>
